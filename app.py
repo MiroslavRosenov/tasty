@@ -1,0 +1,31 @@
+import dotenv
+from quart import Quart, request, render_template
+from ext.base import get_recipe, search_recipe
+from deep_translator import GoogleTranslator
+
+app = Quart(__name__)
+app.jinja_env.filters["translate"] = GoogleTranslator("en", "bg").translate
+translate = GoogleTranslator("bg", "en").translate
+
+@app.route("/", methods=["GET", "POST"])
+async def index() -> None:
+    if request.method == "GET":
+        return await render_template("index.html", data={})
+
+    if request.method == "POST":
+        recipe = translate((await request.form).get("recipe"))
+        data = await search_recipe(query=recipe)
+        
+        if data.get("error", 0) == 404:
+            return await render_template("404.html")
+
+        data["originalSearch"] = (await request.form).get("recipe")
+        return await render_template("recipes.html", data=data)
+
+@app.route("/recipe/<int:id>", methods=["GET"])
+async def recipe(id: int) -> None:
+    return await render_template("details.html", data=await get_recipe(id=id))
+
+if __name__ == "__main__":
+    dotenv.load_dotenv()
+    app.run(debug=True, use_reloader=True)
