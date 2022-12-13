@@ -1,4 +1,5 @@
 import dotenv
+from mysql.connector import MySQLConnection, cursor
 from quart import Quart, request, render_template
 from ext.base import get_recipe, search_recipe
 from deep_translator import GoogleTranslator
@@ -10,7 +11,7 @@ translate = GoogleTranslator("bg", "en").translate
 @app.route("/", methods=["GET", "POST"])
 async def index() -> None:
     if request.method == "GET":
-        return await render_template("index.html", data={})
+        return await render_template("index.html")
 
     if request.method == "POST":
         recipe = translate((await request.form).get("recipe"))
@@ -28,4 +29,10 @@ async def recipe(id: int) -> None:
 
 if __name__ == "__main__":
     dotenv.load_dotenv()
-    app.run(debug=True, use_reloader=True)
+    app.db = MySQLConnection(
+        host ="127.0.0.1",
+        user ="root",
+        database="tasty"
+    )
+
+    app.run(debug=True, use_reloader=True, port=8000)

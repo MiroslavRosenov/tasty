@@ -3,8 +3,13 @@ import os
 from ext.cache import getter
 from typing import Dict
 from quart import current_app
+from deep_translator import GoogleTranslator
+from mysql.connector import cursor
 
-@getter("recipe_by_query")
+
+translate = GoogleTranslator("en", "bg").translate
+
+# @getter("recipe_by_query")
 async def search_recipe(query: str) -> Dict:
     resp = httpx.get(
         "https://api.spoonacular.com/recipes/search",
@@ -27,19 +32,25 @@ async def search_recipe(query: str) -> Dict:
             "details": "Recipe not found"
         }
 
-    return {
-        "results":[
-            {
-                "name": x["title"],
-                "id": x["id"],
-                "readyInMinutes": x["readyInMinutes"],
-                "sourceUrl": x["sourceUrl"],
-                "image": f"https://spoonacular.com/recipeImages/{x['id']}-636x393.{x['image'].split('.')[1]}",
-            } for x in data
-        ],
-    }
+    with current_app.db.cursor(dictionary=True, buffered=False) as cur:
+        result = {
+            "results": []
+        }
 
-@getter("recipe_by_id",)
+        for x in data:
+            cur.execute(f"SELECT * FROM recipes WHERE id = {x['id']}")
+            if not (resp := cur.fetchone()):
+                query = "INSERT INTO recipes (id, name, readyInMinutes, image, sourceUrl) VALUES (%s, %s, %s, %s, %s);"
+                cur.execute(query, (x["id"], translate(x["title"]), x["readyInMinutes"], f"https://spoonacular.com/recipeImages/{x['id']}-636x393.{x['image'].split('.')[1]}", x["sourceUrl"]))
+
+                cur.execute(f"SELECT * FROM recipes WHERE id = {x['id']}")
+                resp = cur.fetchone()
+
+            current_app.db.commit()
+            result["results"].append(resp)
+    return result
+
+# @getter("recipe_by_id",)
 async def get_recipe(id: int) -> Dict:
     resp = httpx.get(
         f"https://api.spoonacular.com/recipes/{id}/information",
