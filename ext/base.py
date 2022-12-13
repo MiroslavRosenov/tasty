@@ -1,11 +1,10 @@
 import httpx
 import os
-from ext.cache import getter
+import json
+
 from typing import Dict
 from quart import current_app
 from deep_translator import GoogleTranslator
-from mysql.connector import cursor
-
 
 translate = GoogleTranslator("en", "bg").translate
 
@@ -33,19 +32,25 @@ async def search_recipe(query: str) -> Dict:
         }
 
     with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-        result = {
-            "results": []
-        }
+        result = {"results": []}
 
         for x in data:
             cur.execute(f"SELECT * FROM recipes WHERE id = {x['id']}")
             if not (resp := cur.fetchone()):
-                query = "INSERT INTO recipes (id, name, readyInMinutes, image, sourceUrl) VALUES (%s, %s, %s, %s, %s);"
-                cur.execute(query, (x["id"], translate(x["title"]), x["readyInMinutes"], f"https://spoonacular.com/recipeImages/{x['id']}-636x393.{x['image'].split('.')[1]}", x["sourceUrl"]))
+                query = "INSERT INTO recipes (id, name, original_name, readyInMinutes, imageUrl) VALUES (%s, %s, %s, %s, %s);"
+                cur.execute(
+                    query, 
+                    (
+                        x["id"],
+                        translate(x["title"]),
+                        x["title"],
+                        x["readyInMinutes"],
+                        f"https://spoonacular.com/recipeImages/{x['id']}-636x393.{x['image'].split('.')[1]}"
+                    )
+                )
 
                 cur.execute(f"SELECT * FROM recipes WHERE id = {x['id']}")
                 resp = cur.fetchone()
-
             current_app.db.commit()
             result["results"].append(resp)
     return result
@@ -71,19 +76,27 @@ async def get_recipe(id: int) -> Dict:
             "details": "Recipe not found"
         }
 
-    return {
-        "name": data["title"].capitalize(),
-        "readyInMinutes": data["readyInMinutes"],
-        "image": data["image"],
-        "ingredients": [
-            {
-                "name": x["originalName"].capitalize(),
-                "image": x['image']
-            } for x in data["extendedIngredients"]
-        ],
-        "instructions": [
-            {
-                "step": x["step"]
-            } for x in data["analyzedInstructions"][0]["steps"]
-        ] if len(data["analyzedInstructions"]) != 0 else []
-    }
+    with current_app.db.cursor(dictionary=True, buffered=False) as cur:
+        cur.execute(f"SELECT * FROM recipe_details WHERE id = {data['id']}")
+        if not (resp := cur.fetchone()):
+            query = "INSERT INTO recipe_details (id, name, original_name, readyInMinutes, imageUrl, ingredients, instructions) VALUES (%s, %s, %s, %s, %s, %s, %s);"
+            cur.execute(
+                query, 
+                (
+                    data["id"],
+                    translate(data["title"]),
+                    data["title"],
+                    data["readyInMinutes"],
+                    data["image"],
+                    json.dumps([{"name": translate(x["originalName"]), "imageUrl": f"https://spoonacular.com/cdn/ingredients_100x100/{x['image']}"} for x in data["extendedIngredients"]], ensure_ascii=False),
+                    json.dumps([{"step": translate(x["step"])} for x in data["analyzedInstructions"][0]["steps"]] if len(data["analyzedInstructions"]) != 0 else [], ensure_ascii=False)
+                )
+            )
+            
+            cur.execute(f"SELECT * FROM recipe_details WHERE id = {data['id']}")
+            resp = cur.fetchone()
+        current_app.db.commit()
+    
+    resp["ingredients"] = json.loads(resp["ingredients"])
+    resp["instructions"] = json.loads(resp["instructions"])
+    return resp

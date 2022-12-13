@@ -3,12 +3,12 @@
 <section class="text-gray-600 body-font">
     <div class="container mx-auto flex px-5 py-24 md:flex-row flex-col items-left">
         <div class="lg:max-w-lg lg:w-full md:w-1/2 w-5/6 mb-10 md:mb-0">
-			<h1 class="title-font sm:text-4xl text-3xl mb-4 font-small text-gray-900">{{ data.name|translate }}</h1>
-			<img class="object-cover object-center rounded" alt="hero" src="{{ data.image }}"/>
+			<h1 class="title-font sm:text-4xl text-3xl mb-4 font-small text-gray-900">{{ data.name }}</h1>
+			<img class="object-cover object-center rounded" alt="hero" src="{{ data.imageUrl }}"/>
             <h2 class="title-font sm:text-4xl text-3xl mb-4 font-small text-gray-900">Стъпки за приготвяне</h2>
 			<ul>
                 {% for instruction in data.instructions %}
-                <li>• {{ instruction.step|translate }}</li>
+                <li>• {{ instruction.step }}</li>
                 <br>
                 {% endfor %}
             </ul>
@@ -22,8 +22,8 @@
                     <tbody>
                         {% for ingredient in data.ingredients %}
                         <tr>
-                            <td class="px-4 py-3"><img class="object-cover object-center rounded" style='height:30px;' alt="hero" src="https://spoonacular.com/cdn/ingredients_100x100/{{ingredient.image}}" /></td>
-                            <td class="px-4 py-3">{{ ingredient.name|translate }}</td>
+                            <td class="px-4 py-3"><img class="object-cover object-center rounded" style='height:30px;' alt="hero" src="{{ ingredient.imageUrl }}" /></td>
+                            <td class="px-4 py-3">{{ ingredient.name }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
