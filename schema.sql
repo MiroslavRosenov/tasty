@@ -17,3 +17,18 @@ CREATE TABLE IF NOT EXISTS recipe_details (
     instructions JSON NOT NULL,
     last_looked TIMESTAMP DEFAULT NOW() NOT NULL
 )
+
+CREATE TABLE IF NOT EXISTS accounts (
+    id BIGINT SERIAL,
+    firstName TEXT NOT NULL,
+    lastName TEXT NOT NULL,
+    email TEXT NOT NULL PRIMARY KEY,
+    password TEXT NOT NULL
+)
+
+CREATE TABLE IF NOT EXISTS bookmarks (
+    recipe_id BIGINT NOT NULL,
+    account_id BIGINT NOT NULL,
+
+    PRIMARY KEY (recipe_id, account_id)
+)

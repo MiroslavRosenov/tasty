@@ -1,11 +1,11 @@
 import dotenv
-from mysql.connector import MySQLConnection, cursor
-from quart import Quart, request, render_template
+import hashlib
+from mysql.connector import MySQLConnection
+from quart import Quart, render_template, abort, request, session
 from ext.base import get_recipe, search_recipe
 from deep_translator import GoogleTranslator
 
 app = Quart(__name__)
-app.jinja_env.filters["translate"] = GoogleTranslator("en", "bg").translate
 translate = GoogleTranslator("bg", "en").translate
 
 @app.route("/", methods=["GET", "POST"])
@@ -31,6 +31,20 @@ async def index() -> None:
 @app.route("/recipe/<int:id>", methods=["GET"])
 async def recipe(id: int) -> None:
     return await render_template("details.html", data=await get_recipe(id=id))
+
+@app.route("/signup", methods=["GET", "POST"])
+async def signup() -> None:
+    return hashlib.sha256()
+
+
+@app.route("/bookmarks")
+async def bookmarks() -> None:
+    if request.method == "GET":
+        if not session.get("auth_state"):
+            abort(403)
+            
+        return await render_template("bookmarks.html")
+
 
 if __name__ == "__main__":
     dotenv.load_dotenv()
