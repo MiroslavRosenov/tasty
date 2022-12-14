@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS recipe_details (
     original_name TEXT NOT NULL,
     readyInMinutes INT NOT NULL,
     imageUrl TEXT NOT NULL,
-    ingredients JSON,
-    instructions JSON
+    ingredients JSON NOT NULL,
+    instructions JSON NOT NULL,
+    last_looked TIMESTAMP DEFAULT NOW() NOT NULL
 )

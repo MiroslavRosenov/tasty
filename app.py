@@ -11,7 +11,12 @@ translate = GoogleTranslator("bg", "en").translate
 @app.route("/", methods=["GET", "POST"])
 async def index() -> None:
     if request.method == "GET":
-        return await render_template("index.html")
+        with app.db.cursor(dictionary=True, buffered=False) as cur:
+            query = "SELECT * FROM recipe_details ORDER BY last_looked DESC LIMIT 6;"
+            cur.execute(query)
+            resp = cur.fetchall()
+
+        return await render_template("index.html", data={"results": resp})
 
     if request.method == "POST":
         recipe = translate((await request.form).get("recipe"))
