@@ -30,9 +30,21 @@
 			</svg>
 			<span class="ml-3 text-xl">ВКУСНО!</span>
 		</a>
-		<nav class="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-400 flex flex-wrap items-center text-base justify-center">
+		<!-- <div class="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-400 flex flex-wrap text-base float-right">
 			<a href="/" class="mr-5 hover:text-gray-900">Search by Ingredients</a>
-		</nav>
-		<br>
+		</div> -->
+		<!-- <span class="float-right">aaa</span> -->
+		<!-- <div class="relative h-32 w-32 ...">
+			<div class="absolute top-0 right-0 h-16 w-16 ...">03</div>
+		  </div> -->
+		<span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
+			{% if auth %}
+			<span>
+				Към профила
+			</span>
+			{% else %}
+				<a href="{{ url_for('signin') }}">Вход</a>
+			{% endif %}
+		</span>
 	</div>
 </header>

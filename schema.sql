@@ -19,11 +19,13 @@ CREATE TABLE IF NOT EXISTS recipe_details (
 )
 
 CREATE TABLE IF NOT EXISTS accounts (
-    id BIGINT SERIAL,
+    id VARCHAR(12) PRIMARY KEY,
+    email TEXT NOT NULL,
     firstName TEXT NOT NULL,
     lastName TEXT NOT NULL,
-    email TEXT NOT NULL PRIMARY KEY,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    confirmed BOOLEAN NOT NULL DEFAULT 0
 )
 
 CREATE TABLE IF NOT EXISTS bookmarks (
