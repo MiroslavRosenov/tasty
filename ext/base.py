@@ -4,14 +4,25 @@ import json
 
 from typing import Dict
 from quart import current_app
-from deep_translator import GoogleTranslator
+from quart_auth import AuthUser
 
 from ext.cache import getter
 from ext.translator import Translator
 
 translate = Translator().translate
-# translate = GoogleTranslator("en", "bg").translate
 
+class User(AuthUser):
+    def __init__(self, auth_id: str) -> None:
+        super().__init__(auth_id)
+
+    def get(self) -> Dict[str , any]:
+        with current_app.db.cursor(dictionary=True, buffered=False) as cur:
+            query = "SELECT * FROM accounts WHERE id = %s" 
+            cur.execute(query, (self.auth_id,))
+            resp = cur.fetchone()
+            return resp
+
+    
 @getter("recipe_by_query")
 async def search_recipe(query: str) -> Dict:
     resp = httpx.get(
@@ -59,7 +70,7 @@ async def search_recipe(query: str) -> Dict:
         current_app.db.commit()
     return result
 
-@getter("recipe_by_id",)
+@getter("recipe_by_id")
 async def get_recipe(id: int) -> Dict:
     resp = httpx.get(
         f"https://api.spoonacular.com/recipes/{id}/information",

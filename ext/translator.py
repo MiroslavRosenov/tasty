@@ -38,7 +38,7 @@ class Translator:
         })
         return self.BASE_URL + '?' + _encoded
 
-    def translate(self, text: str, target_language, source_language: str = "en") -> str:
+    def translate(self, text: str, target_language: str = "bg", source_language: str = "en") -> str:
         """
         Translate text from source language to target language.
         
@@ -64,13 +64,5 @@ class Translator:
         result_container = soup.find("div", {"class": "result-container"})
         
         if result_container:
-            # # return Response(
-            # #     source_language,
-            # #     target_language,
-            # #     text,
-            # #     translated_text
-            # # )
-            print(f"Took {time.perf_counter() - start} seconds to translate.")
             return result_container.text
-
         return None

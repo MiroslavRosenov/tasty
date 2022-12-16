@@ -38,7 +38,7 @@
 			<div class="absolute top-0 right-0 h-16 w-16 ...">03</div>
 		  </div> -->
 		<span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
-			{% if auth %}
+			{% if current_user.is_authenticated %}
 			<span>
 				Към профила
 			</span>
