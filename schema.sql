@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS recipes (
     original_name TEXT NOT NULL,
     readyInMinutes INT NOT NULL,
     imageUrl TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(X
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 )
 
 CREATE TABLE IF NOT EXISTS recipe_details (
@@ -18,6 +18,13 @@ CREATE TABLE IF NOT EXISTS recipe_details (
     last_looked TIMESTAMP NOT NULL DEFAULT NOW()
 )
 
+CREATE TABLE IF NOT EXISTS bookmarks (
+    recipe_id BIGINT NOT NULL,
+    account_id BIGINT NOT NULL,
+
+    PRIMARY KEY (recipe_id, account_id)
+)
+
 CREATE TABLE IF NOT EXISTS accounts (
     id VARCHAR(12) PRIMARY KEY,
     email TEXT NOT NULL UNIQUE,
@@ -28,9 +35,8 @@ CREATE TABLE IF NOT EXISTS accounts (
     confirmed BOOLEAN
 )
 
-CREATE TABLE IF NOT EXISTS bookmarks (
-    recipe_id BIGINT NOT NULL,
-    account_id BIGINT NOT NULL,
-
-    PRIMARY KEY (recipe_id, account_id)
+CREATE TABLE IF NOT EXISTS tokens (
+    token TEXT NOT NULL,
+    email TEXT NOT NULL,
+    UNIQUE (token, email)
 )

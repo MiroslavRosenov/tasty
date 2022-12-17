@@ -36,14 +36,14 @@
 		<!-- <span class="float-right">aaa</span> -->
 		<!-- <div class="relative h-32 w-32 ...">
 			<div class="absolute top-0 right-0 h-16 w-16 ...">03</div>
-		  </div> -->
+		</div> -->
 		<span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
 			{% if current_user.is_authenticated %}
 			<span>
 				Към профила
 			</span>
 			{% else %}
-				<a href="{{ url_for('signin') }}">Вход</a>
+				<a href="{{ url_for('accounts.signin') }}">Вход</a>
 			{% endif %}
 		</span>
 	</div>
