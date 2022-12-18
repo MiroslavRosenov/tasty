@@ -31,7 +31,7 @@ async def search_recipe(query: str) -> Dict:
         params={
             "query": query,
             "apiKey": os.getenv("TOKEN"),
-            "number": 9
+            "number": 12
         }
     )
 

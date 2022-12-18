@@ -1,7 +1,7 @@
 import hashlib
 
 
-from quart_auth import AuthUser, login_required, login_user, current_user
+from quart_auth import AuthUser, login_required, login_user, logout_user, current_user
 from quart import Blueprint, render_template, flash, redirect, url_for, request, current_app
 
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
@@ -57,6 +57,11 @@ async def signup() -> None:
 
                 await flash("Вие успешно създадохте своя акаунт! Моля, потвърдете го с линка, изпратен на вашия имейл.", "success")
                 return await render_template("signup.html")
+
+@accounts.get("/signout")
+async def signout() -> None:
+    logout_user()
+    return redirect(url_for("recipes.index"))
 
 @accounts.route("/password-reset")
 async def password_reset() -> None:

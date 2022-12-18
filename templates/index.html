@@ -1,41 +1,57 @@
-{% extends "base.html" %}
+{% extends "base.html" %}search
 {% block content %}
-<section class="text-gray-600 body-font">
-	<div class="container mx-auto flex px-5 pt-5 items-center justify-center flex-col">
-		<!-- <img class="lg:w-4/6 md:w-5/6 w-6/6 mb-10 object-cover object-center rounded" alt="hero" src="{{ url_for('static', filename='images/food.jpg') }}"> -->
-		<div class="text-center lg:w-2/3 w-full">
-			<h1 class="title-font sm:text-4xl text-3xl mb-1 font-medium text-gray-900">Потърсете всяка рецепта, която желаете!</h1>
-			<p class="mb-8 leading-relaxed">Just type the recipe's name and you'll get a bunch recipes of the one you've requested.</p>
-			<div class="flex justify-center">
-				<form action="/" method="POST">
-					<div class="input-group">
-						<input required type="text" class="bg-white rounded border border-radius-100 border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200" name="recipe" placeholder="Search for recipes..">
-						<button class="btn btn-default" type="submit">
-							<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-1" viewBox="0 0 24 24">
-								<path d="M5 12h14M12 5l7 7-7 7"></path>
-							</svg>
-						</button>
-					</div>
-				</form>
+<body class="bg-blue-50 overflow-x-hidden">
+	<div class="container mx-auto flex flex-col lg:flex-row items-center gap-12 mt-10">
+		<!-- Content -->
+		<div class="flex flex-1 flex-col items-center lg:items-start overflow-hidden">
+			<h2 class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500 font-bold text-3xl md:text-4 lg:text-6xl text-center lg:text-center mb-2 py-2 slideUp">
+				Учете. Гответе. Споделяйте.
+			</h2>
+			<div class="overflow-hidden">
+				<p class="font-thin text-xl md:text-3xl text-center lg:text-left slideUp">
+					Сбогувайте те се дългите и разочароващи
+				</p>
+				<p class="font-thin text-xl md:text-3xl text-center lg:text-left slideUp">
+					блогове за храна и видеоклипове с рецепти. 
+				</p>
+				<p class="font-thin text-xl md:text-3xl text-center lg:text-left slideUp">
+					Приготвяйте всяко ястие за минути нашите карти с рецепти.
+				</p>
 			</div>
-			
-			<h1 class="sm:text-4xl text-3xl mt-4 font text-gray-900">Последни разглежданя</h1>
-			<div class="flex justify-center flex-wrap m-3 mt-5">
-				{% for recipe in data.results %}
-				<a href="/recipe/{{ recipe.id }}" target="_blank">
-					<div class="xl:w-1/3 md:w-1/2 p-3 w-full">
-						<div class="bg-gray-100 p-6 rounded-lg">
-							<img class="h-40 rounded w-full object-cover object-center mb-6" src="{{ recipe.imageUrl }}">
-							<h3 class="tracking-widest text-red-500 text-xs font-medium title-font">
-								<h2 class="text-lg text-gray-900 font-medium title-font">{{ recipe.name }}</h2>
-								<a href="/recipe/{{ recipe.id }}" target="_blank"><span>Детайли ⟶</span></a>
-							</h3>
-						</div>
-					</div>
+			<div class="flex mx-auto md:mx-40 mt-6 justify-center flex-wrap gap-6">
+				<a href="#search">
+				<button type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-xl font-regular py-2 px-4 rounded transition duration-500 ease-in-out bg-blue-600 hover:bg-red-600 transform hover:-translate-y-1 hover:scale-110 ...">Търсене на ястия</button>
 				</a>
-				{% endfor %}
 			</div>
 		</div>
+		<!-- Image -->
+		<div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
+			<img class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full fadeInRotate" src="{{ url_for('static', filename='images/hero-dish.png') }}" alt="" />
+		</div>
 	</div>
-</section>
+	<!-- Rounded Rectangle -->
+	<div class=" hidden md:block overflow-hidden bg-bookmark-purple rounded-l-full absolute h-80 w-2/4 top-32 right-0 lg: -bottom-28 lg:-right-36"></div>
+
+	<!--Browse Dish Section-->
+	<section class="relative md:m-10">
+		<div id="search" class="font-medium text-2xl md:text-4xl text-center mb-6">Търсете любимото си ястие</div>
+		<div class="bg-white p-3 shadow-sm rounded-sm">
+			<!--Search bar-->
+			<div class="border rounded overflow-hidden flex mb-4">
+				<input id="home-dish-search-bar" type="text" class="w-11/12 px-4 py-2 border-gray-300 focus:ring-blue-600 font-regular" placeholder="Какво търсиш да сготвиш?">
+				<button id="home-dish-search-button" class="flex w-1/12 items-center justify-center md:px-4 border-l">
+					<svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+						<path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/>
+					</svg>
+				</button>
+			</div>
+			<!--Recent Posts-->
+			<p id="home-no-posts" class="hidden text-center my-4 text-sm font-medium text-gray-400">Няма намерени ястия</p>
+			<div id="home-posts" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+			</div>
+		</div>
+	</section>
+
+	<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+</body>
 {% endblock content %}

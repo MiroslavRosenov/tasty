@@ -1,82 +1,42 @@
-<header class="text-gray-600 body-font">
-	<div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-		<a href='/' class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-			<svg height="35" viewBox="0 0 516 516" width="35" xmlns="http://www.w3.org/2000/svg">
-				<g id="flat">
-					<path d="m392 392h32a0 0 0 0 1 0 0v76a20 20 0 0 1 -20 20h-12a0 0 0 0 1 0 0v-96a0 0 0 0 1 0 0z" fill="#961b20"/>
-					<path d="m88 24h316a20 20 0 0 1 20 20v360a20 20 0 0 1 -20 20h-316a0 0 0 0 1 0 0v-400a0 0 0 0 1 0 0z" fill="#e82f3e"/>
-					<path d="m376 192a64 64 0 0 0 -60.635-63.911 64 64 0 0 0 -118.767.094c-1.52-.109-3.05-.183-4.6-.183a64.009 64.009 0 0 0 -16 125.984v58.016h160.002v-60.67a64.007 64.007 0 0 0 40-59.33z" fill="#eaeae8"/>
-					<path d="m88 424-48 32v-400a32 32 0 0 1 32-32h16z" fill="#961b20"/>
-					<g fill="#cbcbcb">
-						<path d="m304.006 261.985a8.024 8.024 0 0 1 -2-.254 71.61 71.61 0 0 1 -33.491-19.4h-25.03a71.61 71.61 0 0 1 -33.491 19.4 8 8 0 1 1 -3.988-15.5 55.761 55.761 0 0 0 28-17.2 8 8 0 0 1 6-2.706h32a8 8 0 0 1 6 2.706 55.761 55.761 0 0 0 28 17.2 8 8 0 0 1 -1.988 15.75z"/>
-						<path d="m216 320a8 8 0 0 1 -8-8v-32a8 8 0 0 1 16 0v32a8 8 0 0 1 -8 8z"/>
-						<path d="m296 320a8 8 0 0 1 -8-8v-32a8 8 0 0 1 16 0v32a8 8 0 0 1 -8 8z"/>
-						<path d="m256 320a8 8 0 0 1 -8-8v-32a8 8 0 0 1 16 0v32a8 8 0 0 1 -8 8z"/>
-						<path d="m176 312h160v32h-160z"/>
-					</g>
-					<path d="m72 424h320a0 0 0 0 1 0 0v64a0 0 0 0 1 0 0h-320a32 32 0 0 1 -32-32 32 32 0 0 1 32-32z" fill="#eaeae8"/>
-					<path d="m424 88h48l-16 24 16 24h-48z" fill="#02a437"/>
-					<path d="m424 168h64l-16 24 16 24h-64z" fill="#009cf7"/>
-					<path d="m224 392h-24a8 8 0 0 1 0-16h24a8 8 0 0 1 0 16z" fill="#961b20"/>
-					<path d="m320 392h-64a8 8 0 0 1 0-16h64a8 8 0 0 1 0 16z" fill="#961b20"/>
-					<path d="m424 136-112-112h92a20 20 0 0 1 20 20z" fill="#fbb540"/>
-					<circle cx="368" cy="80" fill="#ea9d2d" r="24"/>
-					<path d="m120 464h-48a8 8 0 0 1 0-16h48a8 8 0 0 1 0 16z" fill="#cbcbcb"/>
-					<path d="m160 464h-8a8 8 0 0 1 0-16h8a8 8 0 0 1 0 16z" fill="#cbcbcb"/>
-					<path d="m392 464h-200a8 8 0 0 1 0-16h200z" fill="#cbcbcb"/>
-				</g>
-			</svg>
-			<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-			</svg>
-			<span class="ml-3 text-xl">ВКУСНО!</span>
+<header>
+<nav class="bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-900 shadow-lg">
+	<div class="container flex flex-wrap items-center justify-between mx-auto max-w-6xl mx-auto px-4">
+		<a href="/" class="flex items-center">
+		<img src="{{ url_for('static', filename='images/logo-display.svg') }}" alt="Logo">
+		<span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">ВКУСНО</span>
 		</a>
-		<!-- <div class="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-400 flex flex-wrap text-base float-right">
-			<a href="/" class="mr-5 hover:text-gray-900">Search by Ingredients</a>
-		</div> -->
-		<!-- <span class="float-right">aaa</span> -->
-		<!-- <div class="relative h-32 w-32 ...">
-			<div class="absolute top-0 right-0 h-16 w-16 ...">03</div>
-		</div> -->
-		<span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
-			{% if current_user.is_authenticated %}
-			<span>
-				<nav class="bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-900">
-					<div class="container flex flex-wrap items-center justify-between mx-auto">
-						<a href="https://flowbite.com/" class="flex items-center">
-						<img src="https://flowbite.com/docs/images/logo.svg" class="h-6 mr-3 sm:h-9" alt="Flowbite Logo" />
-						<span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>
-						</a>
-						<div class="flex md:order-2">
-							<button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get started</button>
-							<button data-collapse-toggle="navbar-cta" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-cta" aria-expanded="false">
-								<span class="sr-only">Open main menu</span>
-								<svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-									<path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-								</svg>
-							</button>
-						</div>
-						<div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-cta">
-							<ul class="flex flex-col p-4 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-								<li>
-									<a href="#" class="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white" aria-current="page">Home</a>
-								</li>
-								<li>
-									<a href="#" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">About</a>
-								</li>
-								<li>
-									<a href="#" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Services</a>
-								</li>
-								<li>
-									<a href="#" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Contact</a>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</nav>
-			</span>
-			{% else %}
-				<a href="{{ url_for('accounts.signin') }}">Вход</a>
-			{% endif %}
-		</span>
+		<button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
+			<span class="sr-only">Open main menu</span>
+			<svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+				<path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+			</svg>
+		</button>
+		<div class="hidden w-full md:block md:w-auto" id="navbar-default">
+			<ul class="flex flex-col p-4 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+				<li>
+					<a href="{{ url_for('recipes.index') }}" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Начало</a>
+				</li>
+				{% if current_user.auth_id == None %}
+				<li>
+					<a href="{{ url_for('accounts.signin') }}" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Впиши се</a>
+				</li>
+				<li>
+					<a href="{{ url_for('accounts.signup') }}" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Регистрирай се</a>
+				</li>
+				{% else %}
+				<li>
+					<a href="{{ url_for('accounts.signup') }}" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Любими ястия</a>
+				</li>
+				<li>
+					<a href="{{ url_for('accounts.signup') }}" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">История</a>
+				</li>
+				<li>
+					<a href="{{ url_for('accounts.signout') }}" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Отписване</a>
+				</li>
+				</div>
+				{% endif %}
+			</ul>
+		</div>
 	</div>
+</nav>
 </header>

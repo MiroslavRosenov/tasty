@@ -9,7 +9,8 @@ from quart_auth import AuthManager, Unauthorized
 from ext.mail import EmailHandler
 
 from blueprints.accounts import accounts
-from blueprints.recipes import recipes
+from blueprints.dishes import dishes
+from blueprints.api import api
 
 app = Quart(__name__)
 app.config["SECURITY_PASSWORD_SALT"] =  "ffe2d77f8f34dd3e382569c525bb854853e2b42a98fb47927d9a7b7a881f0b04"
@@ -17,7 +18,8 @@ app.config["SECRET_KEY"] =              "9f86d081884c7d659a2feaa0c55ad015a3bf4f1
 
 app.auth = AuthManager(app)
 app.register_blueprint(accounts)
-app.register_blueprint(recipes)
+app.register_blueprint(dishes)
+app.register_blueprint(api)
 
 @app.errorhandler(Unauthorized)
 async def redirect_to_login(*_: Exception) -> None:
