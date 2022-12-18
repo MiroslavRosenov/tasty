@@ -96,7 +96,7 @@ async def confirm_account(token: str) -> None:
             await flash("Успешно потвърдихте акаунта си ", "success")
             return await render_template("signin.html")
 
-@login_required
 @accounts.route("/bookmarks")
+@login_required
 async def bookmarks() -> None:
-        return await render_template("bookmarks.html")
+    return await render_template("bookmarks.html")
