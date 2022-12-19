@@ -9,7 +9,7 @@
 			</h2>
 			<div class="overflow-hidden">
 				<p class="font-thin text-xl md:text-3xl text-center lg:text-left slideUp">
-					Сбогувайте те се дългите и разочароващи
+					Сбогувайте се дългите и разочароващи
 				</p>
 				<p class="font-thin text-xl md:text-3xl text-center lg:text-left slideUp">
 					блогове за храна и видеоклипове с рецепти. 
@@ -37,14 +37,16 @@
 		<div id="search" class="font-medium text-2xl md:text-4xl text-center mb-6">Търсете любимото си ястие</div>
 		<div class="bg-white p-3 shadow-sm rounded-sm">
 			<!--Search bar-->
+			
 			<div class="border rounded overflow-hidden flex mb-4">
-				<input id="home-dish-search-bar" type="text" class="w-11/12 px-4 py-2 border-gray-300 focus:ring-blue-600 font-regular" placeholder="Какво търсиш да сготвиш?">
+				<input name="tags" id="home-dish-search-bar" type="text" class="w-11/12 px-4 py-2 border-gray-300 focus:ring-blue-600 font-regular" placeholder="Какво търсиш да сготвиш?">
 				<button id="home-dish-search-button" class="flex w-1/12 items-center justify-center md:px-4 border-l">
 					<svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 						<path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/>
 					</svg>
 				</button>
 			</div>
+			
 			<!--Recent Posts-->
 			<p id="home-no-posts" class="hidden text-center my-4 text-sm font-medium text-gray-400">Няма намерени ястия</p>
 			<div id="home-posts" class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -52,6 +54,9 @@
 		</div>
 	</section>
 
+	<script src="https://unpkg.com/@yaireo/tagify"></script>
+    <script src="https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
 	<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+
 </body>
 {% endblock content %}

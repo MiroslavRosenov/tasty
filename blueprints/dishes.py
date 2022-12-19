@@ -1,4 +1,4 @@
-from quart import Blueprint, render_template, flash, redirect, url_for, request, current_app
+from quart import Blueprint, jsonify, render_template, request, current_app
 
 from ext.translator import Translator
 from ext.base import get_recipe, search_recipe
@@ -8,6 +8,7 @@ translate = Translator().translate
 
 @dishes.get("/")
 async def index() -> None:
+    # return str(await search_recipe(["eggs", "bacon", "muffins"]))
     return await render_template("index.html")
 
 @dishes.get("/dishes/<int:id>")

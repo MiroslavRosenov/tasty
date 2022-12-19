@@ -1,15 +1,13 @@
-CREATE TABLE IF NOT EXISTS recipes (
+CREATE TABLE IF NOT EXISTS dishes (
     id BIGINT PRIMARY KEY,
-    name TEXT NOT NULL,
-    original_name TEXT NOT NULL,
-    readyInMinutes INT NOT NULL,
+    title TEXT NOT NULL,
     imageUrl TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    ingredients JSON
 )
 
-CREATE TABLE IF NOT EXISTS recipe_details (
+CREATE TABLE IF NOT EXISTS details (
     id BIGINT PRIMARY KEY,
-    name TEXT NOT NULL,
+    title TEXT NOT NULL,
     original_name TEXT NOT NULL,
     readyInMinutes INT NOT NULL,
     imageUrl TEXT NOT NULL,

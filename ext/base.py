@@ -2,7 +2,7 @@ import httpx
 import os
 import json
 
-from typing import Dict
+from typing import Dict, List
 from quart import current_app
 from quart_auth import AuthUser
 
@@ -23,15 +23,16 @@ class User(AuthUser):
             return resp
 
     
-@getter("recipe_by_query")
-async def search_recipe(query: str) -> Dict:
+# @getter("recipe_by_query")
+async def search_recipe(ingredients: List[str]) -> Dict:
     resp = httpx.get(
-        "https://api.spoonacular.com/recipes/search",
+        "https://api.spoonacular.com/recipes/findByIngredients",
 
         params={
-            "query": query,
+            "ingredients": ",+".join(ingredients),
             "apiKey": os.getenv("TOKEN"),
-            "number": 12
+            "number": 12,
+            "ranking": 2
         }
     )
 
@@ -40,7 +41,7 @@ async def search_recipe(query: str) -> Dict:
             "error": resp.status_code
         }
     
-    if not (data := (resp.json()["results"])):
+    if not (dishes := (resp.json())):
         return {
             "error": 404,
             "details": "Recipe not found"
@@ -49,22 +50,21 @@ async def search_recipe(query: str) -> Dict:
     with current_app.db.cursor(dictionary=True, buffered=False) as cur:
         result = {"results": []}
 
-        for x in data:
-            cur.execute(f"SELECT * FROM recipes WHERE id = {x['id']}")
+        for dish in dishes:
+            cur.execute("SELECT * FROM dishes WHERE id = %s", (dish["id"],))
             if not (resp := cur.fetchone()):
-                query = "INSERT INTO recipes (id, name, original_name, readyInMinutes, imageUrl) VALUES (%s, %s, %s, %s, %s);"
+                query = "INSERT INTO dishes (id, title, imageUrl, ingredients) VALUES (%s, %s, %s, %s);"
                 cur.execute(
                     query, 
                     (
-                        x["id"],
-                        translate(x["title"], "bg", "en"),
-                        x["title"],
-                        x["readyInMinutes"],
-                        f"https://spoonacular.com/recipeImages/{x['id']}-636x393.{x['image'].split('.')[1]}"
+                        dish["id"],
+                        translate(dish["title"], "bg", "en"),
+                        dish["image"],
+                        json.dumps([str(x["original"]) for x in dish["usedIngredients"]])
                     )
                 )
 
-                cur.execute(f"SELECT * FROM recipes WHERE id = {x['id']}")
+                cur.execute("SELECT * FROM dishes WHERE id = %s", (dish["id"],))
                 resp = cur.fetchone()
             result["results"].append(resp)
         current_app.db.commit()
@@ -75,7 +75,7 @@ async def get_recipe(id: int) -> Dict:
     resp = httpx.get(
         f"https://api.spoonacular.com/recipes/{id}/information",
         params={
-            # "includeNutrition": False,
+            "includeNutrition": False,
             "apiKey": os.getenv("TOKEN"),
         }
     )
@@ -94,13 +94,12 @@ async def get_recipe(id: int) -> Dict:
     with current_app.db.cursor(dictionary=True, buffered=False) as cur:
         cur.execute(f"SELECT * FROM recipe_details WHERE id = {data['id']}")
         if not (resp := cur.fetchone()):
-            query = "INSERT INTO recipe_details (id, name, original_name, readyInMinutes, imageUrl, ingredients, instructions) VALUES (%s, %s, %s, %s, %s, %s, %s);"
+            query = "INSERT INTO recipe_details (id, title, readyInMinutes, imageUrl, ingredients, instructions) VALUES (%s, %s, %s, %s, %s, %s, %s);"
             cur.execute(
                 query, 
                 (
                     data["id"],
                     translate(data["title"], "bg", "en"),
-                    data["title"],
                     data["readyInMinutes"],
                     data["image"],
                     json.dumps([{"name": translate(x["originalName"], "bg", "en"), "imageUrl": f"https://spoonacular.com/cdn/ingredients_100x100/{x['image']}"} for x in data["extendedIngredients"]], ensure_ascii=False),
