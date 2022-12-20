@@ -56,7 +56,6 @@ class Translator:
         # if len(target_language) != 2: 
         #     target_language = lang_codes.convert_to_code(target_language.lower())
 
-        start = time.perf_counter()
         url = self._generate_url(source_language, target_language, text)
         response = self.CLIENT.get(url)
         soup = bs4.BeautifulSoup(response.text, "lxml")

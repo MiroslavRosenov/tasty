@@ -5,7 +5,7 @@ from quart import Blueprint, render_template, request, current_app
 from quart_auth import AuthUser, login_user
 
 from ext.translator import Translator
-from ext.base import search_recipe
+from ext.base import search_tags
 
 api = Blueprint("api", __name__, url_prefix="/api")
 translate = Translator().translate
@@ -13,7 +13,7 @@ translate = Translator().translate
 @api.post("/searchRecipe")
 async def search() -> None:
     data = json.loads(await request.data)
-    return await search_recipe([translate(x["value"], "en", "bg") for x in data["ingredients"]])
+    return await search_tags([translate(x["value"], "en", "bg") for x in data["ingredients"]])
 
 @api.get("/recentRecipes")
 async def recent() -> None:

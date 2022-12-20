@@ -37,7 +37,7 @@ function populateRecentPostedDishes(data) {
         
         let upperTag = document.createElement("span");
         upperTag.className = "inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-        upperTag.textContent = dish["ingredients"];
+        upperTag.textContent = dish["ingredients"]
 
 
         tagDiv.appendChild(upperTag);
@@ -55,6 +55,10 @@ function fetchDishes(){
         type: "GET",
         url: "/api/recentRecipes",
         success: function(res) {
+            // console.log(res["results"])
+            // res["results"].forEach(element => {
+            //     console.log(element)
+            // });
             populateRecentPostedDishes(res["results"]);
         },
         error: function(error){
@@ -74,6 +78,7 @@ function onSearchChange(element){
         url: "/api/searchRecipe",
         data: JSON.stringify({"ingredients": JSON.parse(element.target.value)}),
         success: function(data) {
+            console.log(data["results"])
             if (data["results"] === undefined) {
                 document.getElementById("home-no-posts").style.display = "block";
                 populateRecentPostedDishes([]);

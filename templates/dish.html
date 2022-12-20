@@ -1,16 +1,14 @@
 {% extends "base.html" %}search
 {% block content %}
 <body class="bg-blue-50 overflow-x-hidden">
-    <div>
-        <div class="flex pt-5 md:pt-12 justify-center">
-            <div class="mb-8">
-                <h1 class="title-font sm:text-4xl text-3xl mb-4 font-small text-gray-900 text-center">{{ data.name }}</h1>
-                <img class="rounded-lg object-cover object-center w-full" src="{{ data.imageUrl }}"/>
-            </div>
+    <div class="flex pt-5 md:pt-12 justify-center">
+        <div class="mb-8">
+            <img class="rounded-lg object-cover object-center w-full" src="{{ data.imageUrl }}"/>
         </div>
     </div>
 
     <div>
+        <h1 class="title-font sm:text-4xl text-3xl mb-4 font-small text-gray-900 text-center">{{ data.title }}</h1>
         <div class="py-5 flex justify-center">
             <div class="bg-white w-11/12 md:w-7/10 md:mx-8 md:flex md:max-w-5xl shadow-lg rounded-lg">
                 <div class="pt-5 px-6 max-w-xl lg:max-w-5xl mb-4">
