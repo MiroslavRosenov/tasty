@@ -29,10 +29,10 @@ async def search_recipe(ingredients: List[str]) -> Dict:
         "https://api.spoonacular.com/recipes/findByIngredients",
 
         params={
-            "ingredients": ",+".join(ingredients),
+            "ingredients": ",".join(ingredients),
             "apiKey": os.getenv("TOKEN"),
-            "number": 12,
-            "ranking": 2
+            "number": 8,
+            "ranking": 1
         }
     )
 
@@ -46,6 +46,7 @@ async def search_recipe(ingredients: List[str]) -> Dict:
             "error": 404,
             "details": "Recipe not found"
         }
+    
 
     with current_app.db.cursor(dictionary=True, buffered=False) as cur:
         result = {"results": []}
@@ -53,14 +54,14 @@ async def search_recipe(ingredients: List[str]) -> Dict:
         for dish in dishes:
             cur.execute("SELECT * FROM dishes WHERE id = %s", (dish["id"],))
             if not (resp := cur.fetchone()):
-                query = "INSERT INTO dishes (id, title, imageUrl, ingredients) VALUES (%s, %s, %s, %s);"
+                query = "INSERT INTO dishes (id, title, imageUrl, ingredients) VALUES (%s, %s, %s, %s)"
                 cur.execute(
                     query, 
                     (
                         dish["id"],
                         translate(dish["title"], "bg", "en"),
                         dish["image"],
-                        json.dumps([str(x["original"]) for x in dish["usedIngredients"]])
+                        ", ".join([translate(x["name"], "bg", "en") for x in dish["usedIngredients"] + dish["missedIngredients"]])
                     )
                 )
 
@@ -68,6 +69,7 @@ async def search_recipe(ingredients: List[str]) -> Dict:
                 resp = cur.fetchone()
             result["results"].append(resp)
         current_app.db.commit()
+    print("Sent!")
     return result
 
 @getter("recipe_by_id")
@@ -92,24 +94,24 @@ async def get_recipe(id: int) -> Dict:
         }
 
     with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-        cur.execute(f"SELECT * FROM recipe_details WHERE id = {data['id']}")
+        cur.execute("SELECT * FROM details WHERE id = %s", (data['id'],))
         if not (resp := cur.fetchone()):
-            query = "INSERT INTO recipe_details (id, title, readyInMinutes, imageUrl, ingredients, instructions) VALUES (%s, %s, %s, %s, %s, %s, %s);"
+            query = "INSERT INTO details (id, title, readyInMinutes, imageUrl, ingredients, instructions) VALUES (%s, %s, %s, %s, %s, %s)"
             cur.execute(
                 query, 
                 (
                     data["id"],
-                    translate(data["title"], "bg", "en"),
+                    translate(data["title"]),
                     data["readyInMinutes"],
                     data["image"],
-                    json.dumps([{"name": translate(x["originalName"], "bg", "en"), "imageUrl": f"https://spoonacular.com/cdn/ingredients_100x100/{x['image']}"} for x in data["extendedIngredients"]], ensure_ascii=False),
-                    json.dumps([{"step": translate(x["step"], "bg", "en")} for x in data["analyzedInstructions"][0]["steps"]] if len(data["analyzedInstructions"]) != 0 else [], ensure_ascii=False)
+                    json.dumps([{"name": translate(x["originalName"]), "imageUrl": f"https://spoonacular.com/cdn/ingredients_100x100/{x['image']}"} for x in data["extendedIngredients"]], ensure_ascii=False),
+                    json.dumps([{"step": translate(x["step"])} for x in data["analyzedInstructions"][0]["steps"]] if len(data["analyzedInstructions"]) != 0 else [], ensure_ascii=False)
                 )
             )
             
-            cur.execute(f"SELECT * FROM recipe_details WHERE id = {data['id']}")
+            cur.execute("SELECT * FROM details WHERE id = %s", (data['id'],))
             resp = cur.fetchone()
-        cur.execute("UPDATE recipe_details SET last_looked = NOW() WHERE id = %s", (resp["id"],))
+        cur.execute("UPDATE details SET last_looked = NOW() WHERE id = %s", (resp["id"],))
         
         current_app.db.commit()
 

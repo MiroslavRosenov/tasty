@@ -1,44 +1,57 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="text-gray-600 body-font">
-	<div class="h-screen flex justify-center items-center">
-		<form action="/signup" method="POST">
-			{% for category, message in get_flashed_messages(true) %}
-				{% if category == 'error' %}
-                <div class="bg-red-100 rounded-lg py-5 px-6 mb-4 text-base text-red-700 mb-3" role="alert">
-                    {{ message }}
-                </div>
-                {% elif category == 'success' %}
-                <div class="bg-green-100 rounded-lg py-5 px-6 mb-4 text-base text-green-700 mb-3" role="alert">
-                    {{ message }}
-                </div>
-                {% endif %}
-			{% endfor %}
-			
-            <div class="grid grid-cols-2 gap-4">
-                <div class="form-group mb-6">
-                    <label for="firstNameInput" class="form-label inline-block mb-2 text-gray-700">Име</label>
-                    <input type="text" class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" id="firstNameInput" name="firstName" required>
-                </div>
-                <div class="form-group mb-6">
-                    <label for="lastNameInput" class="form-label inline-block mb-2 text-gray-700">Фамилия</label>
-                    <input type="text" class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" id="lastNameInput" name="lastName" required>
-                </div>
+<body class="bg-blue-50">
+    <div class="bg-grey-lighter min-h-screen flex flex-col">
+        <div class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2">
+            <div class="bg-white px-6 py-8 rounded shadow-md text-black w-full">
+                <h1 class="mb-8 text-3xl text-center font-medium text-blue-600">Sign up</h1>
+                <input 
+                    type="text"
+                    class="block border border-grey-light w-full p-3 rounded mb-4 font-light"
+                    id='signup-name'
+                    name="fullname"
+                    placeholder="Full Name">
+
+                <input 
+                    type="text"
+                    class="block border border-grey-light w-full p-3 rounded mb-4 font-light"
+                    id='signup-email'
+                    name="email"
+                    placeholder="Email">
+
+                <input 
+                    type="password"
+                    class="block border border-grey-light w-full p-3 rounded mb-4 font-light"
+                    id='signup-password'
+                    name="password"
+                    placeholder="Password">
+                <input 
+                    type="password"
+                    class="block border border-grey-light w-full p-3 rounded mb-4 font-light"
+                    id='signup-confirm-password'
+                    name="confirm_password"
+                    placeholder="Confirm Password">
+
+                <button type="submit" onClick='signupInputHandler()' class="w-full text-center py-3 rounded bg-blue-600 text-white hover:bg-blue-700 focus:outline-none my-1 font-regular">Create Account</button>
+
+                <!-- <div class="text-center text-sm text-grey-dark mt-4 font-regular">
+                    By signing up, you agree to the 
+                    <a class="no-underline border-b border-grey-dark text-grey-dark" href="#">
+                        Terms of Service
+                    </a> and 
+                    <a class="no-underline border-b border-grey-dark text-grey-dark" href="#">
+                        Privacy Policy
+                    </a>
+                </div> -->
             </div>
-            <div class="form-group mb-6">
-				<label for="emailInput" class="form-label inline-block mb-2 text-gray-700">Имейл адрес</label>
-                <input type="email" class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" id="emailInput" name="email" required>
+
+            <div class="text-grey-dark mt-6 font-regular">
+                Already have an account? 
+                <a class="no-underline border-b border-blue text-blue-600" href="{{ url_for('accounts.signin') }}">
+                    Log in
+                </a>.
             </div>
-            <div class="form-group mb-6">
-                <label for="passwordInput" class="form-label inline-block mb-2 text-gray-700">Парола</label>
-                <input type="password" class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" id="passwordInput" name="password" required>
-            </div>
-            <button type="submit" class="w-full px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">Регистриране</button>
-            <p class="text-gray-800 mt-6 text-center">
-				<a href="/signin" class="text-blue-600 hover:text-blue-700 focus:text-blue-700 transition duration-200 ease-in-out">Вече имаш регистрация?</a>
-			</p>
-        </form>
-	</div>
-    <script src="{{ url_for('static', filename='js/forms.js') }}"></script>
-</section>
+        </div>
+    </div>
+</body>>
 {% endblock content %}

@@ -2,13 +2,12 @@ CREATE TABLE IF NOT EXISTS dishes (
     id BIGINT PRIMARY KEY,
     title TEXT NOT NULL,
     imageUrl TEXT NOT NULL,
-    ingredients JSON
+    ingredients TEXT
 )
 
 CREATE TABLE IF NOT EXISTS details (
     id BIGINT PRIMARY KEY,
     title TEXT NOT NULL,
-    original_name TEXT NOT NULL,
     readyInMinutes INT NOT NULL,
     imageUrl TEXT NOT NULL,
     ingredients JSON NOT NULL,

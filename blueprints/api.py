@@ -1,9 +1,11 @@
 import json
 import hashlib
+
 from quart import Blueprint, render_template, request, current_app
+from quart_auth import AuthUser, login_user
 
 from ext.translator import Translator
-from ext.base import get_recipe, search_recipe
+from ext.base import search_recipe
 
 api = Blueprint("api", __name__, url_prefix="/api")
 translate = Translator().translate
@@ -11,12 +13,12 @@ translate = Translator().translate
 @api.post("/searchRecipe")
 async def search() -> None:
     data = json.loads(await request.data)
-    return await search_recipe([translate(x, "en", "bg") for x in data["ingredients"].split(", ")])
+    return await search_recipe([translate(x["value"], "en", "bg") for x in data["ingredients"]])
 
 @api.get("/recentRecipes")
 async def recent() -> None:
     with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-        query = "SELECT name, id, readyInMinutes, imageUrl FROM recipe_details ORDER BY last_looked DESC LIMIT 12;"
+        query = "SELECT title, id, imageUrl FROM details ORDER BY last_looked DESC LIMIT 12;"
         cur.execute(query)
         return {"results": cur.fetchall()}
 
@@ -35,6 +37,6 @@ async def signin() -> None:
             return {
                 "error": "Моля, потвърдете акаунта си" 
             }, 403
+        login_user(AuthUser(resp["id"]), data.get("remember"))
         return "", 200
         
-        # login_user(AuthUser(resp["id"]), data.get("remember"))

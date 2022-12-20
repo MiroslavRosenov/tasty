@@ -1,4 +1,5 @@
 function populateRecentPostedDishes(data) {
+    console.log("Updating...")
     let postSection = document.getElementById("home-posts");
     
     while (postSection.firstChild) {
@@ -20,23 +21,26 @@ function populateRecentPostedDishes(data) {
         let dishImage = document.createElement("img");
         dishImage.className = "w-full h-64 object-cover";
         dishImage.src = dish["imageUrl"];
-        dishImage.alt = dish["name"];
+        dishImage.alt = dish["title"];
 
         // Text div
         let textDiv = document.createElement("div");
         textDiv.className = "px-6 py-4";
         let titleText = document.createElement("div");
         titleText.className = "font-medium text-xl mb-2 overflow-ellipsis overflow-hidden whitespace-nowrap";
-        titleText.textContent = dish["name"];
+        titleText.textContent = dish["title"];
         textDiv.appendChild(titleText);
 
         // Tag div
         let tagDiv = document.createElement("div");
         tagDiv.className = "px-6 pb-2";
-        let tagSpan = document.createElement("span");
-        tagSpan.className = "inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2";
-        tagSpan.textContent = `${dish["readyInMinutes"]} минути`;
-        tagDiv.appendChild(tagSpan);
+        
+        let upperTag = document.createElement("span");
+        upperTag.className = "inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+        upperTag.textContent = dish["ingredients"];
+
+
+        tagDiv.appendChild(upperTag);
 
         postCard.appendChild(dishImage);
         postCard.appendChild(textDiv);
@@ -59,15 +63,16 @@ function fetchDishes(){
     })
 }
 
-function onSearchChange(element){    
-    if (element.target.value === undefined){
+function onSearchChange(element){
+    if (element.target.value === ""){
         fetchDishes();
         return;
     }
+
     $.ajax({
         type: "POST",
         url: "/api/searchRecipe",
-        data: JSON.stringify({"ingredients": element.target.value}),
+        data: JSON.stringify({"ingredients": JSON.parse(element.target.value)}),
         success: function(data) {
             if (data["results"] === undefined) {
                 document.getElementById("home-no-posts").style.display = "block";
@@ -84,13 +89,8 @@ function onSearchChange(element){
     })
 }
 
-// let searchBar = document.getElementById("home-dish-search-bar");
-// let searchButton = document.getElementById("home-dish-search-button");
-// searchButton.addEventListener("click", onSearchChange);
-
 var input = document.querySelector("input[name=tags]");
-// initialize Tagify on the above input node reference
-tags = new Tagify(input, {originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(", ")});
-input.addEventListener('change', onSearchChange)
+new Tagify(input);
+input.addEventListener("change", onSearchChange)
 
 fetchDishes();
