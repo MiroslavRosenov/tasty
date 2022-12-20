@@ -51,7 +51,6 @@
             </div>
         </div>
     </div>
-
-    <script type="text/javascript" src='../scripts/dishPageHandler.js'></script>
+    <script src="{{ url_for('static', filename='js/favouritesHandler.js') }}" storeUser({{ current_user }})></script>
 </body>
 {% endblock content %}

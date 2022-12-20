@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS dishes (
     id BIGINT PRIMARY KEY,
     title TEXT NOT NULL,
     imageUrl TEXT NOT NULL,
-    ingredients JSON
+    ingredients JSON,
+    timestamp TIMESTAMP
 )
 
 CREATE TABLE IF NOT EXISTS details (
@@ -12,7 +13,6 @@ CREATE TABLE IF NOT EXISTS details (
     imageUrl TEXT NOT NULL,
     ingredients JSON NOT NULL,
     instructions JSON NOT NULL,
-    last_looked TIMESTAMP NOT NULL DEFAULT NOW()
 )
 
 CREATE TABLE IF NOT EXISTS bookmarks (

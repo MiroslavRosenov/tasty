@@ -1,5 +1,5 @@
 import hashlib
-
+import json
 
 from quart_auth import AuthUser, login_required, login_user, logout_user, current_user
 from quart import Blueprint, render_template, flash, redirect, url_for, request, current_app
@@ -18,36 +18,39 @@ async def signin() -> None:
     if request.method == "GET":
         return await render_template("signin.html")
     else:
-        form = await request.form
+        data = json.loads(await request.data)
 
         query = "SELECT * FROM accounts WHERE email = %s AND password = %s"
         with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-            cur.execute(query, (form.get("email"), hashlib.sha256(form.get("password").encode("utf-8")).hexdigest()))
-            if not (resp := cur.fetchone()):
-                await flash("Акаунтът не беше намерен", "error")
-                return await render_template("signin.html")
-            if not resp["confirmed"]:
-                await flash("Моля, потвърдете акаунта си", "error")
-                return await render_template("signin.html")
+            cur.execute(query, (data.get("email"), hashlib.sha256(data.get("password").encode("utf-8")).hexdigest()))
             
-            login_user(AuthUser(resp["id"]), form.get("remember"))
-            return redirect(url_for("recipes.index"))
+            if not (resp := cur.fetchone()):
+                return {
+                    "error": "Акаунтът не беше намерен"
+                }, 403
+            if not resp["confirmed"]:
+                return {
+                    "error": "Моля, потвърдете акаунта си" 
+                }, 403
+            login_user(AuthUser(resp["id"]), data.get("remember"))
+            return "", 200
 
 @accounts.route("/signup", methods=["GET", "POST"])
 async def signup() -> None:
     if request.method == "GET":
         return await render_template("signup.html")
     else:
-        form = await request.form
+        data = json.loads(await request.data)
 
         query = "INSERT INTO accounts (id, email, firstName, lastName, password) VALUES (%s, %s, %s, %s, %s)"
         with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-            email = form.get("email")
+            email = data.get("email")
             try:
-                cur.execute(query, (hashlib.sha256(email.encode("utf-8")).hexdigest(), email, form.get("firstName"), form.get("lastName"), hashlib.sha256(form.get("password").encode("utf-8")).hexdigest()))
+                cur.execute(query, (hashlib.sha256(email.encode("utf-8")).hexdigest(), email, data.get("firstName"), data.get("lastName"), hashlib.sha256(data.get("password").encode("utf-8")).hexdigest()))
             except IntegrityError:
-                await flash("Имейлът вече се използва!", "error")
-                return await render_template("signup.html")
+                return {
+                    "error": "Имейлът вече се използва!" 
+                }, 500
             else:
                 token = generate(email)
                 await current_app.mail.send(
@@ -55,8 +58,9 @@ async def signup() -> None:
                 )
                 current_app.db.commit()
 
-                await flash("Вие успешно създадохте своя акаунт! Моля, потвърдете го с линка, изпратен на вашия имейл.", "success")
-                return await render_template("signup.html")
+                return {
+                    "message": "Вие успешно създадохте своя акаунт! Моля, потвърдете го с линка, изпратен на вашия имейл." 
+                }, 200
 
 @accounts.get("/signout")
 async def signout() -> None:
@@ -84,11 +88,15 @@ async def confirm_account(token: str) -> None:
         await current_app.mail.send(
             email, "Моля, потвърдете регистрацията си", MAIL_BODY.format(token=token)
         )
-        await flash("Линкът е изтекъл, изпратен е нов!", "error")
-        return await render_template("signin.html")
+        return await render_template("exception.html", details={
+            "title": "Не можахме да потвърдим акаунта ви!",
+            "message": "Линкът, който предоставихте, е изтекъл, изпратете ви нов"
+        })
     except BadSignature:
-        await flash("Невалиден линк", "error")
-        return await render_template("signin.html")
+        return await render_template("exception.html", details={
+            "title": "Не можахме да потвърдим акаунта ви!",
+            "message": "Линкът, който предоставихте е невалидна!"
+        })
     else:
         with current_app.db.cursor(dictionary=True, buffered=False) as cur:
             query = "DELETE FROM tokens WHERE token = %s" 
@@ -98,8 +106,11 @@ async def confirm_account(token: str) -> None:
             cur.execute(query, (email,))
             current_app.db.commit()
 
-            await flash("Успешно потвърдихте акаунта си ", "success")
-            return await render_template("signin.html")
+            query = "SELECT * FROM accounts WHERE email = %s"
+            cur.execute(query, (email,))
+            resp = cur.fetchone()
+
+            login_user(AuthUser(resp["id"]), True)
 
 @accounts.route("/bookmarks")
 @login_required

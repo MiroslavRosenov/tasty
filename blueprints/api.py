@@ -5,7 +5,7 @@ from quart import Blueprint, render_template, request, current_app
 from quart_auth import AuthUser, login_user
 
 from ext.translator import Translator
-from ext.base import search_tags
+from ext.base import cursor_to_dict, search_tags
 
 api = Blueprint("api", __name__, url_prefix="/api")
 translate = Translator().translate
@@ -17,26 +17,17 @@ async def search() -> None:
 
 @api.get("/recentRecipes")
 async def recent() -> None:
-    with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-        query = "SELECT title, id, imageUrl FROM details ORDER BY last_looked DESC LIMIT 12;"
+    with current_app.db.cursor(prepared=True, buffered=False) as cur:
+        query = "SELECT id, title, imageUrl, ingredients FROM dishes ORDER BY timestamp DESC LIMIT 12;"
         cur.execute(query)
-        return {"results": cur.fetchall()}
+        return {"results": cursor_to_dict(cur)}
 
-@api.post("/signin")
-async def signin() -> None:
+@api.route("/bookmarks", methods=["POST", "PUT" "DELETE"])
+async def favourites() -> None:
     data = json.loads(await request.data)
-
-    query = "SELECT * FROM accounts WHERE email = %s AND password = %s"
-    with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-        cur.execute(query, (data.get("email"), hashlib.sha256(data.get("password").encode("utf-8")).hexdigest()))
-        if not (resp := cur.fetchone()):
-            return {
-                "error": "Акаунтът не беше намерен"
-            }, 403
-        if not resp["confirmed"]:
-            return {
-                "error": "Моля, потвърдете акаунта си" 
-            }, 403
-        login_user(AuthUser(resp["id"]), data.get("remember"))
-        return "", 200
-        
+    
+    if request.method == "POST":
+        return {
+            "count": 0,
+            "state": True 
+        }

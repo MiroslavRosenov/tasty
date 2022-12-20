@@ -22,12 +22,12 @@ function loginInputHandler(){
 
     if (!validateLoginEmail(emailBox.value)){
         alertBox.classList.remove("hidden")
-        alertMessage.textContent = "Моля, въведете валиден имейл"
+        alertMessage.textContent = "Моля, въведете валиден имейл!"
         return;
     }
     if (!validateLoginPassowrd(passwordBox.value)){
         alertBox.classList.remove("hidden")
-        alertMessage.textContent = "Моля, въведете валидна парола"
+        alertMessage.textContent = "Моля, въведете валидна парола!"
         return;
     }
     
@@ -37,8 +37,7 @@ function loginInputHandler(){
     };
     $.ajax({
         type: "POST",
-        url: "/api/signin",
-
+        url: "/signin",
         data: JSON.stringify(data),
         success: function(resp) {
             window.location.href = "/";

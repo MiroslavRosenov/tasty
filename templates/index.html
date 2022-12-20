@@ -43,14 +43,14 @@
 			</div>
 			
 			<!--Recent Posts-->
-			<p id="home-no-posts" class="hidden text-center my-4 text-sm font-medium text-gray-400">Няма намерени ястия</p>
+			<p id="home-no-posts" class="text-center my-4 text-sm font-medium text-gray-400 hidden">Няма намерени ястия</p>
 			<div id="home-posts" class="grid grid-cols-1 md:grid-cols-4 gap-3"></div>
 		</div>
 	</section>
 
 	<script src="https://unpkg.com/@yaireo/tagify"></script>
     <script src="https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
-	<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/homeHandler.js') }}"></script>
 
 </body>
 {% endblock content %}

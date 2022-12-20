@@ -4,6 +4,7 @@ import os
 from mysql.connector import MySQLConnection
 
 from quart import Quart, render_template, flash
+from werkzeug.exceptions import NotFound
 from quart_auth import AuthManager, Unauthorized
 
 from ext.mail import EmailHandler
@@ -22,9 +23,16 @@ app.register_blueprint(dishes)
 app.register_blueprint(api)
 
 @app.errorhandler(Unauthorized)
-async def redirect_to_login(*_: Exception) -> None:
+async def redirect_to_login(*_: Unauthorized) -> None:
     await flash("Влезте в акаунта си, за да продължите", "error")
     return await render_template("signin.html")
+
+@app.errorhandler(NotFound)
+async def not_found(*_: NotFound) -> None:
+    return await render_template("exception.html", details={
+        "title": "Не можахме да намерим тази страница!",
+        "message": "Страницата, до която се опитвате да отворите, е недостъпна или временно деактивирана"
+    })
 
 if __name__ == "__main__":
     dotenv.load_dotenv()

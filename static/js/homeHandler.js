@@ -1,14 +1,11 @@
 function populateRecentPostedDishes(data) {
-    console.log("Updating...")
     let postSection = document.getElementById("home-posts");
     
     while (postSection.firstChild) {
         postSection.removeChild(postSection.firstChild);
     }
 
-    for (let i = 0; i < data.length; i++){
-        let dish = data[i];
-        
+    data.forEach(dish => {
         // Card div
         let postCard = document.createElement("div");
         postCard.id = dish["id"];
@@ -27,7 +24,7 @@ function populateRecentPostedDishes(data) {
         let textDiv = document.createElement("div");
         textDiv.className = "px-6 py-4";
         let titleText = document.createElement("div");
-        titleText.className = "font-medium text-xl mb-2 overflow-ellipsis overflow-hidden whitespace-nowrap";
+        titleText.className = "font-medium text-xl mb-2 overflow-ellipsis overflow-hidden whitespace-nowrap ...";
         titleText.textContent = dish["title"];
         textDiv.appendChild(titleText);
 
@@ -36,9 +33,8 @@ function populateRecentPostedDishes(data) {
         tagDiv.className = "px-6 pb-2";
         
         let upperTag = document.createElement("span");
-        upperTag.className = "inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-        upperTag.textContent = dish["ingredients"]
-
+        upperTag.className = "inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2 overflow-hidden overflow-ellipsis ..."
+        upperTag.textContent = Array.from(JSON.parse(dish["ingredients"])).join(", ")
 
         tagDiv.appendChild(upperTag);
 
@@ -47,7 +43,7 @@ function populateRecentPostedDishes(data) {
         postCard.appendChild(tagDiv);
 
         postSection.appendChild(postCard);
-    }
+    })
 }
 
 function fetchDishes(){
@@ -55,14 +51,11 @@ function fetchDishes(){
         type: "GET",
         url: "/api/recentRecipes",
         success: function(res) {
-            // console.log(res["results"])
-            // res["results"].forEach(element => {
-            //     console.log(element)
-            // });
+            document.getElementById("home-no-posts").classList.add("hidden")
             populateRecentPostedDishes(res["results"]);
         },
         error: function(error){
-            console.log(JSON.stringify(error));
+            document.getElementById("home-no-posts").classList.remove("hidden")
         }
     })
 }
@@ -73,6 +66,7 @@ function onSearchChange(element){
         return;
     }
 
+    tag.setDisabled(true);
     $.ajax({
         type: "POST",
         url: "/api/searchRecipe",
@@ -80,22 +74,25 @@ function onSearchChange(element){
         success: function(data) {
             console.log(data["results"])
             if (data["results"] === undefined) {
-                document.getElementById("home-no-posts").style.display = "block";
+                document.getElementById("home-no-posts").classList.remove("hidden")
                 populateRecentPostedDishes([]);
             }
             else {
-                document.getElementById("home-no-posts").style.display = "none";
+                document.getElementById("home-no-posts").classList.add("hidden")
                 populateRecentPostedDishes(data["results"]);
             }
         },
         error: function(error){
             console.log(JSON.stringify(error));
+        },
+        complete: function(data) {
+            tag.setDisabled(false);
         }
     })
 }
 
-var input = document.querySelector("input[name=tags]");
-new Tagify(input);
+let input = document.querySelector("input[name=tags]");
+let tag = new Tagify(input, {editTags: false});
 input.addEventListener("change", onSearchChange)
 
 fetchDishes();

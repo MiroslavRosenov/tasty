@@ -23,11 +23,11 @@
                 <span>Нямате акаунт?</span>
                 <a class="no-underline border-b border-blue text-blue-600" href="{{ url_for('accounts.signup') }}">Регистрирайте се!</a>
             </div>
-            <div class="text-grey-dark mt-6 font-regular">
+            <!-- <div class="text-grey-dark mt-6 font-regular">
                 <a class="no-underline border-b border-blue text-blue-600" href="{{ url_for('accounts.signup') }}">Забравеба парола?</a>
-            </div>
+            </div> -->
         </div>
     </div>
-	<script src="{{ url_for('static', filename='js/signIn.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/signInHandler.js') }}"></script>
 </body>
 {% endblock content %}
