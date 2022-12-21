@@ -1,8 +1,7 @@
 import json
-import hashlib
 
-from quart import Blueprint, render_template, request, current_app
-from quart_auth import AuthUser, login_user, current_user
+from quart import Blueprint, redirect, request, current_app
+from quart_auth import Unauthorized, current_user
 
 from ext.translator import Translator
 from ext.base import cursor_to_dict, search_tags
@@ -24,8 +23,10 @@ async def recent() -> None:
 
 @api.route("/bookmarks", methods=["POST", "PUT", "DELETE"])
 async def bookmarks() -> None:
-    if not current_user.is_authenticated:
-        return {"state": False}
+    if not current_user.auth_id:
+        return {
+            "error": "Трябва да сте влезли в акаунта си, за да добавите това ястие към любимите ви ястия!"
+        }, 403
         
     data = json.loads(await request.data)
     if request.method == "POST":

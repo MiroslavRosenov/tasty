@@ -24,7 +24,7 @@ function populateRecentPostedDishes(data) {
         let textDiv = document.createElement("div");
         textDiv.className = "px-6 py-4";
         let titleText = document.createElement("div");
-        titleText.className = "font-medium text-xl mb-2 overflow-ellipsis overflow-hidden whitespace-nowrap ...";
+        titleText.className = "font-medium text-center mb-2 overflow-ellipsis overflow-hidden whitespace-nowrap ...";
         titleText.textContent = dish["title"];
         textDiv.appendChild(titleText);
 
@@ -32,16 +32,14 @@ function populateRecentPostedDishes(data) {
         let tagDiv = document.createElement("div");
         tagDiv.className = "px-6 pb-2";
         
-        let upperTag = document.createElement("span");
-        upperTag.className = "inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2 overflow-hidden overflow-ellipsis ..."
-        upperTag.textContent = Array.from(JSON.parse(dish["ingredients"])).join(", ")
-
-        tagDiv.appendChild(upperTag);
+        let tag = document.createElement("span");
+        tag.className = "inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2 overflow-hidden overflow-ellipsis ..."
+        tag.textContent = Array.from(JSON.parse(dish["ingredients"])).join(", ")
+        tagDiv.appendChild(tag);
 
         postCard.appendChild(dishImage);
         postCard.appendChild(textDiv);
         postCard.appendChild(tagDiv);
-
         postSection.appendChild(postCard);
     })
 }

@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS details (
 CREATE TABLE IF NOT EXISTS bookmarks (
     account BIGINT NOT NULL,
     dish BIGINT NOT NULL,
-    PRIMARY KEY (account, dish)
+    timestamp TIMESTAMP DEFAULT NOW() NOT NULL
+    UNIQUE (account, dish)
 )
 
 CREATE TABLE IF NOT EXISTS accounts (
@@ -27,7 +28,6 @@ CREATE TABLE IF NOT EXISTS accounts (
     firstName TEXT NOT NULL,
     lastName TEXT NOT NULL,
     password TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     confirmed BOOLEAN
 )
 

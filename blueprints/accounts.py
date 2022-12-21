@@ -2,9 +2,10 @@ import hashlib
 import json
 
 from quart_auth import AuthUser, login_required, login_user, logout_user, current_user
-from quart import Blueprint, render_template, flash, redirect, url_for, request, current_app
+from quart import Blueprint, render_template, redirect, url_for, request, current_app
 
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from ext.base import cursor_to_dict
 
 from ext.tokes import generate, confirm
 from mysql.connector.errors import IntegrityError
@@ -115,4 +116,7 @@ async def confirm_account(token: str) -> None:
 @accounts.route("/bookmarks")
 @login_required
 async def bookmarks() -> None:
-    return await render_template("bookmarks.html")
+    with current_app.db.cursor(prepared=True, buffered=False) as cur:
+        query = "SELECT * FROM dishes WHERE id IN (SELECT dish FROM bookmarks WHERE account = %s) ORDER BY timestamp DESC"
+        cur.execute(query, (current_user.auth_id,))
+        return await render_template("bookmarks.html", results=cursor_to_dict(cur))

@@ -2,7 +2,6 @@
 {% block content %}
 <body class="bg-blue-50 overflow-x-hidden">
 	<div class="container mx-auto flex flex-col lg:flex-row items-center gap-12 mt-10">
-		<!-- Content -->
 		<div class="flex flex-1 flex-col items-center lg:items-start overflow-hidden">
 			<h2 class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500 font-bold text-3xl md:text-4 lg:text-6xl text-center lg:text-center mb-2 py-2 slideUp">
 				Учете. Гответе. Споделяйте.
@@ -24,30 +23,21 @@
 				</a>
 			</div>
 		</div>
-		<!-- Image -->
 		<div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
 			<img class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full fadeInRotate" src="{{ url_for('static', filename='images/hero-dish.png') }}" alt="" />
 		</div>
 	</div>
-	<!-- Rounded Rectangle -->
-	<div class=" hidden md:block overflow-hidden bg-bookmark-purple rounded-l-full absolute h-80 w-2/4 top-32 right-0 lg: -bottom-28 lg:-right-36"></div>
-
-	<!--Browse Dish Section-->
+	<div class="hidden md:block overflow-hidden bg-bookmark-purple rounded-l-full absolute h-80 w-2/4 top-32 right-0 lg: -bottom-28 lg:-right-36"></div>
 	<section class="relative md:m-10">
 		<div id="search" class="font-medium text-2xl md:text-4xl text-center mb-6">Гответе с каквото разполагате!</div>
 		<div class="bg-white p-3 shadow-sm rounded-sm">
-			<!--Search bar-->
-			
 			<div class="border rounded overflow-hidden flex mb-4">
 				<input name="tags" id="home-dish-search-bar" type="text" class="w-full px-4 py-2 border-gray-300 focus:ring-blue-600 font-regular" placeholder="Какво търсиш да сготвиш?">
 			</div>
-			
-			<!--Recent Posts-->
 			<p id="home-no-posts" class="text-center my-4 text-sm font-medium text-gray-400 hidden">Няма намерени ястия</p>
-			<div id="home-posts" class="grid grid-cols-1 md:grid-cols-4 gap-3"></div>
+			<div id="home-posts" class="grid grid-cols-2 md:grid-cols-6 gap-5"></div>
 		</div>
 	</section>
-
 	<script src="https://unpkg.com/@yaireo/tagify"></script>
     <script src="https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
 	<script src="{{ url_for('static', filename='js/homeHandler.js') }}"></script>

@@ -24,8 +24,10 @@ app.register_blueprint(api)
 
 @app.errorhandler(Unauthorized)
 async def redirect_to_login(*_: Unauthorized) -> None:
-    await flash("Влезте в акаунта си, за да продължите", "error")
-    return await render_template("signin.html")
+    return await render_template("exception.html", details={
+        "title": "Не можахте да извършите това действие!",
+        "message": "Влезте в акаунта си, за да продължите"
+    })
 
 @app.errorhandler(NotFound)
 async def not_found(*_: NotFound) -> None:

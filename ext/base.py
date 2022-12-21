@@ -5,7 +5,6 @@ import contextlib
 
 from typing import Optional, Dict, List
 from quart import current_app
-from quart_auth import AuthUser
 from mysql.connector.cursor import MySQLCursorPrepared
 
 from ext.cache import getter
@@ -13,18 +12,6 @@ from ext.translator import Translator
 
 translate = Translator().translate
 
-class User(AuthUser):
-    def __init__(self, auth_id: str) -> None:
-        super().__init__(auth_id)
-
-    def get(self) -> Dict[str , any]:
-        with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-            query = "SELECT * FROM accounts WHERE id = %s" 
-            cur.execute(query, (self.auth_id,))
-            resp = cur.fetchone()
-            return resp
-
-    
 # @getter("recipe_by_tags")
 async def search_tags(ingredients: List[str]) -> Dict:
     with current_app.db.cursor(prepared=True, buffered=False) as cur:

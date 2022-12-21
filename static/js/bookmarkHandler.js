@@ -2,48 +2,48 @@ function getDish(){
     return parseInt(window.location.href.split("/dishes/")[1])
 }
 
-function likeDish(element){
+function addDish(element){
     $.ajax({
         type: "PUT",
         url: "/api/bookmarks",
         data: JSON.stringify({"id": getDish()}),
         success: function(res) {
             element.setAttribute("fill", "#EC4899");
-            displayLikesCount();
+            displayCount();
         },
         error: function(error){
-            console.log("Error");
-            console.log(JSON.stringify(error));
+            alertBox.classList.remove("hidden")
+            alertMessage.textContent = error["responseJSON"]["error"]
         }
     });
 }
 
-function unlikeDish(element){
+function removeDish(element){
     $.ajax({
         type: "DELETE",
         url: "/api/bookmarks",
         data: JSON.stringify({"id": getDish()}),
         success: function(res) {
             element.setAttribute("fill", "#FFFFFF");
-            displayLikesCount();
+            displayCount();
         },
         error: function(error){
-            console.log("Error");
-            console.log(JSON.stringify(error));
+            alertBox.classList.remove("hidden")
+            alertMessage.textContent = error["responseJSON"]["error"]
         }
     });
 }
 
-function toggleLikeButton(element){
+function toggleButton(element) {
     if (element.getAttribute("fill") === "#FFFFFF"){
-        likeDish(element);
+        addDish(element);
     }
     else {
-        unlikeDish(element);
+        removeDish(element);
     }
 }
 
-function displayLikesCount(){
+function displayCount(){
     let bookmarks = document.getElementById("dish-page-num-likes");
     $.ajax({
         type: "POST",
@@ -51,14 +51,11 @@ function displayLikesCount(){
         data: JSON.stringify({"id": getDish()}),
         success: function(resp) {
             bookmarks.textContent = resp["count"];
-        },
-        error: function(error){
-            console.log(JSON.stringify(error));
         }
     });
 }
 
-function initializeLikeButton(){
+function bookmarkButton(){
     let likeButton = document.getElementById("dish-page-like-btn");
     
     $.ajax({
@@ -67,11 +64,14 @@ function initializeLikeButton(){
         data: JSON.stringify({"id": getDish()}),
         success: function(resp) {
             if (resp["state"] === true){
-                likeButton.setAttribute('fill', '#EC4899');
+                likeButton.setAttribute("fill", "#EC4899");
             }
         }
     });
 }
 
-initializeLikeButton();
-displayLikesCount();
+let alertBox = document.getElementById("alertBox")
+let alertMessage = document.getElementById("alertMessage")
+
+bookmarkButton();
+displayCount();
