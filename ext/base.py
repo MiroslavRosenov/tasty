@@ -1,6 +1,7 @@
 import httpx
 import os
 import json
+import contextlib
 
 from typing import Optional, Dict, List
 from quart import current_app
@@ -61,7 +62,7 @@ async def search_tags(ingredients: List[str]) -> Dict:
 
         for dish in dishes:
             cur.execute("SELECT * FROM dishes WHERE id = %s", (dish["id"],))
-            if not (resp := cursor_to_dict(cur)):
+            if not (resp := cursor_to_dict(cur, "one")):
                 query = "INSERT INTO dishes (id, title, imageUrl, ingredients) VALUES (%s, %s, %s, %s)"
                 cur.execute(
                     query, 
@@ -74,10 +75,11 @@ async def search_tags(ingredients: List[str]) -> Dict:
                 )
 
                 cur.execute("SELECT * FROM dishes WHERE id = %s", (dish["id"],))
-                resp = cursor_to_dict(cur)
+                resp = cursor_to_dict(cur, "one")
             results.append(resp)
         current_app.db.commit()
-    return {"results": results[0]}
+    print(results)
+    return {"results": results}
 
 @getter("recipe_by_id")
 async def recipe_details(id: int) -> Dict:
@@ -133,9 +135,13 @@ async def recipe_details(id: int) -> Dict:
     resp["instructions"] = json.loads(resp["instructions"])
     return resp
 
-def cursor_to_dict(cur: MySQLCursorPrepared) -> Optional[List[Dict]]:
+def cursor_to_dict(cur: MySQLCursorPrepared, strategy: str = "all") -> Optional[List[Dict]]:
     row_headers=[x for x in cur.column_names]
-
-    if (data := [dict(zip(row_headers, result)) for result in cur.fetchall()]):
-        return data
-    return None
+    data = [dict(zip(row_headers, result)) for result in cur.fetchall()] or None
+    
+    match strategy:
+        case "all":
+            return data 
+        case "one":
+            with contextlib.suppress(TypeError):
+                return data[0]

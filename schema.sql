@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS dishes (
     title TEXT NOT NULL,
     imageUrl TEXT NOT NULL,
     ingredients JSON,
-    timestamp TIMESTAMP
+    timestamp TIMESTAMP DEFAULT NOW() NOT NULL
 )
 
 CREATE TABLE IF NOT EXISTS details (
@@ -12,18 +12,17 @@ CREATE TABLE IF NOT EXISTS details (
     readyInMinutes INT NOT NULL,
     imageUrl TEXT NOT NULL,
     ingredients JSON NOT NULL,
-    instructions JSON NOT NULL,
+    instructions JSON NOT NULL
 )
 
 CREATE TABLE IF NOT EXISTS bookmarks (
-    recipe_id BIGINT NOT NULL,
-    account_id BIGINT NOT NULL,
-
-    PRIMARY KEY (recipe_id, account_id)
+    account BIGINT NOT NULL,
+    dish BIGINT NOT NULL,
+    PRIMARY KEY (account, dish)
 )
 
 CREATE TABLE IF NOT EXISTS accounts (
-    id VARCHAR(12) PRIMARY KEY,
+    id SERIAL,
     email TEXT NOT NULL UNIQUE,
     firstName TEXT NOT NULL,
     lastName TEXT NOT NULL,

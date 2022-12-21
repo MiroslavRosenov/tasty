@@ -64,13 +64,12 @@ function signupInputHandler(){
         "email": emailBox.value, 
         "password": passwordBox.value
     }
-    console.log(data);
     $.ajax({
         type: "POST",
         url: "/signup",
         data: JSON.stringify(data),
         success: function(resp) {
-            alertBox.classList.replace("bg-green-100 rounded-lg py-5 px-6 mb-4 text-base text-green-700 mb-3")
+            // alertBox.classList.replace("bg-green-100 rounded-lg py-5 px-6 mb-4 text-base text-green-700 mb-3")
             alertMessage.textContent = resp["message"]
         },
         error: function(error){

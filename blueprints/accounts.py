@@ -42,11 +42,11 @@ async def signup() -> None:
     else:
         data = json.loads(await request.data)
 
-        query = "INSERT INTO accounts (id, email, firstName, lastName, password) VALUES (%s, %s, %s, %s, %s)"
+        query = "INSERT INTO accounts (email, firstName, lastName, password) VALUES (%s, %s, %s, %s)"
         with current_app.db.cursor(dictionary=True, buffered=False) as cur:
             email = data.get("email")
             try:
-                cur.execute(query, (hashlib.sha256(email.encode("utf-8")).hexdigest(), email, data.get("firstName"), data.get("lastName"), hashlib.sha256(data.get("password").encode("utf-8")).hexdigest()))
+                cur.execute(query, (email, data.get("firstName"), data.get("lastName"), hashlib.sha256(data.get("password").encode("utf-8")).hexdigest()))
             except IntegrityError:
                 return {
                     "error": "Имейлът вече се използва!" 
