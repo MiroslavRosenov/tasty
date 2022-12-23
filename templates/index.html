@@ -27,8 +27,9 @@
 			<img class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full fadeInRotate" src="{{ url_for('static', filename='images/hero-dish.png') }}" alt="" />
 		</div>
 	</div>
-	<div class="hidden md:block overflow-hidden bg-bookmark-purple rounded-l-full absolute h-80 w-2/4 top-32 right-0 lg: -bottom-28 lg:-right-36"></div>
-	<section class="relative md:m-10">
+	<canvas id="myChart"></canvas>
+
+	<!-- <section class="relative md:m-10">
 		<div id="search" class="font-medium text-2xl md:text-4xl text-center mb-6">Гответе с каквото разполагате!</div>
 		<div class="bg-white p-3 shadow-sm rounded-sm">
 			<div class="border rounded overflow-hidden flex mb-4">
@@ -37,10 +38,13 @@
 			<p id="home-no-posts" class="text-center my-4 text-sm font-medium text-gray-400 hidden">Няма намерени ястия</p>
 			<div id="home-posts" class="grid grid-cols-2 md:grid-cols-6 gap-5"></div>
 		</div>
-	</section>
+	</section> -->
 	<script src="https://unpkg.com/@yaireo/tagify"></script>
     <script src="https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
-	<script src="{{ url_for('static', filename='js/homeHandler.js') }}"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+	<!-- https://www.chartjs.org/docs/latest/getting-started/ -->
 
 </body>
 {% endblock content %}

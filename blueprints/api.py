@@ -1,10 +1,12 @@
 import json
+import contextlib
 
-from quart import Blueprint, redirect, request, current_app
-from quart_auth import Unauthorized, current_user
+from quart import Blueprint, request, current_app
+from quart_auth import current_user
 
 from ext.translator import Translator
 from ext.base import cursor_to_dict, search_tags
+from mysql.connector.errors import IntegrityError
 
 api = Blueprint("api", __name__, url_prefix="/api")
 translate = Translator().translate
@@ -26,7 +28,7 @@ async def bookmarks() -> None:
     if not current_user.auth_id:
         return {
             "error": "Трябва да сте влезли в акаунта си, за да добавите това ястие към любимите ви ястия!"
-        }, 403
+        }, 401
         
     data = json.loads(await request.data)
     if request.method == "POST":
@@ -38,8 +40,9 @@ async def bookmarks() -> None:
     if request.method == "PUT":
         query = "INSERT INTO bookmarks(account, dish) VALUES(%s, %s)"
         with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-            cur.execute(query, (current_user.auth_id, data.get("id"),))
-            current_app.db.commit()
+            with contextlib.suppress(IntegrityError):
+                cur.execute(query, (current_user.auth_id, data.get("id"),))
+                current_app.db.commit()
             return "", 200
 
     if request.method == "DELETE":

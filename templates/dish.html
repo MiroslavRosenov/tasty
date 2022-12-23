@@ -27,14 +27,6 @@
         </div>
     </div>
 
-    <div id="alertBox" class="py-5 flex justify-center hidden">
-        <div class="w-11/12 md:w-7/10 md:mx-8 md:flex md:max-w-5xl shadow-lg rounded-lg">
-            <div class="bg-red-100 rounded-lg py-5 px-6 text-base text-red-700 w-full" role="alert">
-                <h1 id="alertMessage">aa</h1>
-            </div>
-        </div>
-    </div>
-
     <div class="py-5 flex justify-center">
         <div class="bg-white w-11/12 md:w-7/10 md:mx-8 md:flex md:max-w-5xl shadow-lg rounded-lg">
             <div class="pt-5 px-6 max-w-xl lg:max-w-5xl mb-4">
@@ -48,8 +40,8 @@
                 
 
                 <div class="mt-8 flex flex-row">
-                    <svg id="dish-page-like-btn" class="w-6 h-6 cursor-pointer" fill="#FFFFFF" stroke="#EC4899" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" onclick="toggleButton(this)" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    <svg id="fav-icon" class="w-6 h-6 cursor-pointer" fill="#FFFFFF" stroke="#EC4899" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path id="fav-button" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                     </svg>
                     <span id="dish-page-num-likes" class="ml-2">0</span>
                     <svg class="w-6 h-6 stroke-current text-pink-500 fill-current text-white" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
@@ -57,6 +49,15 @@
             </div>
         </div>
     </div>
+
+    <div id="alertBox" class="py-5 flex justify-center hidden">
+        <div class="w-11/12 md:w-7/10 md:mx-8 md:flex md:max-w-5xl shadow-lg rounded-lg">
+            <div class="bg-red-100 rounded-lg py-5 px-6 text-base text-red-700 w-full" role="alert">
+                <h1 id="alertMessage"></h1>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='js/bookmarkHandler.js') }}"></script>
 </body>
 {% endblock content %}

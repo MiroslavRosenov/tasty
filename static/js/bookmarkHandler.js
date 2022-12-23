@@ -34,17 +34,20 @@ function removeDish(element){
     });
 }
 
-function toggleButton(element) {
-    if (element.getAttribute("fill") === "#FFFFFF"){
-        addDish(element);
+function toggleButton() {
+    let icon = document.getElementById("fav-icon");
+    
+    if (icon.getAttribute("fill") === "#FFFFFF"){
+        addDish(icon);
     }
     else {
-        removeDish(element);
+        removeDish(icon);
     }
 }
 
 function displayCount(){
     let bookmarks = document.getElementById("dish-page-num-likes");
+    
     $.ajax({
         type: "POST",
         url: "/api/bookmarksCount",
@@ -55,16 +58,14 @@ function displayCount(){
     });
 }
 
-function bookmarkButton(){
-    let likeButton = document.getElementById("dish-page-like-btn");
-    
+function bookmarkButton(){    
     $.ajax({
         type: "POST",
         url: "/api/bookmarks",
         data: JSON.stringify({"id": getDish()}),
         success: function(resp) {
             if (resp["state"] === true){
-                likeButton.setAttribute("fill", "#EC4899");
+                document.getElementById("fav-icon").setAttribute("fill", "#EC4899");
             }
         }
     });
@@ -72,6 +73,9 @@ function bookmarkButton(){
 
 let alertBox = document.getElementById("alertBox")
 let alertMessage = document.getElementById("alertMessage")
+
+let button = document.getElementById("fav-button")
+button.addEventListener("click", toggleButton)
 
 bookmarkButton();
 displayCount();

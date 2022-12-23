@@ -39,7 +39,7 @@ function populateRecentPostedDishes(data) {
 
         postCard.appendChild(dishImage);
         postCard.appendChild(textDiv);
-        postCard.appendChild(tagDiv);
+        // postCard.appendChild(tagDiv);
         postSection.appendChild(postCard);
     })
 }

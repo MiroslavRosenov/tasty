@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS details (
 CREATE TABLE IF NOT EXISTS bookmarks (
     account BIGINT NOT NULL,
     dish BIGINT NOT NULL,
-    timestamp TIMESTAMP DEFAULT NOW() NOT NULL
+    timestamp TIMESTAMP DEFAULT NOW() NOT NULL,
+    
     UNIQUE (account, dish)
 )
 
@@ -34,5 +35,6 @@ CREATE TABLE IF NOT EXISTS accounts (
 CREATE TABLE IF NOT EXISTS tokens (
     token TEXT NOT NULL,
     email TEXT NOT NULL,
+    
     UNIQUE (token, email)
 )

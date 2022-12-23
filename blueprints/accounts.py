@@ -28,7 +28,7 @@ async def signin() -> None:
             if not (resp := cur.fetchone()):
                 return {
                     "error": "Акаунтът не беше намерен"
-                }, 403
+                }, 404
             if not resp["confirmed"]:
                 return {
                     "error": "Моля, потвърдете акаунта си" 
@@ -119,4 +119,4 @@ async def bookmarks() -> None:
     with current_app.db.cursor(prepared=True, buffered=False) as cur:
         query = "SELECT * FROM dishes WHERE id IN (SELECT dish FROM bookmarks WHERE account = %s) ORDER BY timestamp DESC"
         cur.execute(query, (current_user.auth_id,))
-        return await render_template("bookmarks.html", results=cursor_to_dict(cur))
+        return await render_template("bookmarks.html", results=cursor_to_dict(cur) or [])
