@@ -14,6 +14,7 @@ function addDish(element){
         error: function(error){
             alertBox.classList.remove("hidden")
             alertMessage.textContent = error["responseJSON"]["error"]
+            alertBox.scrollIntoView();
         }
     });
 }

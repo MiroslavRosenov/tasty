@@ -1,5 +1,6 @@
 import hashlib
 import json
+import time
 
 from quart_auth import AuthUser, login_required, login_user, logout_user, current_user
 from quart import Blueprint, render_template, redirect, url_for, request, current_app
@@ -43,11 +44,11 @@ async def signup() -> None:
     else:
         data = json.loads(await request.data)
 
-        query = "INSERT INTO accounts (email, firstName, lastName, password) VALUES (%s, %s, %s, %s)"
+        query = "INSERT INTO accounts (id, email, firstName, lastName, password) VALUES (%s ,%s, %s, %s, %s)"
         with current_app.db.cursor(dictionary=True, buffered=False) as cur:
             email = data.get("email")
             try:
-                cur.execute(query, (email, data.get("firstName"), data.get("lastName"), hashlib.sha256(data.get("password").encode("utf-8")).hexdigest()))
+                cur.execute(query, (int(time.time()), email, data.get("firstName"), data.get("lastName"), hashlib.sha256(data.get("password").encode("utf-8")).hexdigest()))
             except IntegrityError:
                 return {
                     "error": "Имейлът вече се използва!" 
@@ -66,7 +67,7 @@ async def signup() -> None:
 @accounts.get("/signout")
 async def signout() -> None:
     logout_user()
-    return redirect(url_for("recipes.index"))
+    return redirect(url_for("dishes.index"))
 
 @accounts.route("/password-reset")
 async def password_reset() -> None:

@@ -51,6 +51,7 @@ async def search_tags(ingredients: List[str]) -> Dict:
             cur.execute("SELECT * FROM dishes WHERE id = %s", (dish["id"],))
             if not (resp := cursor_to_dict(cur, "one")):
                 query = "INSERT INTO dishes (id, title, imageUrl, ingredients) VALUES (%s, %s, %s, %s)"
+
                 cur.execute(
                     query, 
                     (
@@ -65,7 +66,6 @@ async def search_tags(ingredients: List[str]) -> Dict:
                 resp = cursor_to_dict(cur, "one")
             results.append(resp)
         current_app.db.commit()
-    print(results)
     return {"results": results}
 
 @getter("recipe_by_id")
@@ -109,7 +109,7 @@ async def recipe_details(id: int) -> Dict:
                 data["readyInMinutes"],
                 data["image"],
                 json.dumps([{"name": translate(x["name"]), "imageUrl": f"https://spoonacular.com/cdn/ingredients_100x100/{x['image']}"} for x in data["extendedIngredients"]], ensure_ascii=False),
-                json.dumps([{"step": translate(x["step"])} for x in data["analyzedInstructions"][0]["steps"]] if len(data["analyzedInstructions"]) != 0 else [], ensure_ascii=False)
+                json.dumps([translate(x["step"]) for x in data["analyzedInstructions"][0]["steps"]] if len(data["analyzedInstructions"]) != 0 else [], ensure_ascii=False)
             )
         )
         

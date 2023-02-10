@@ -1,7 +1,6 @@
 import urllib.parse
 import httpx
 import bs4
-import time
 
 
 class Response:
@@ -58,7 +57,7 @@ class Translator:
 
         url = self._generate_url(source_language, target_language, text)
         response = self.CLIENT.get(url)
-        soup = bs4.BeautifulSoup(response.text, "lxml")
+        soup = bs4.BeautifulSoup(response.text, features="html.parser")
         
         result_container = soup.find("div", {"class": "result-container"})
         
