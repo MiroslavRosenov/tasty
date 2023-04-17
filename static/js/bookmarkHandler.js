@@ -3,6 +3,14 @@ function getDish(){
 }
 
 function addDish(element){
+    var notyf = new Notyf({
+        duration: 2000,
+        position: {
+            x: "right",
+            y: "top",
+        }
+    });
+
     $.ajax({
         type: "PUT",
         url: "/api/bookmarks",
@@ -12,14 +20,20 @@ function addDish(element){
             displayCount();
         },
         error: function(error){
-            alertBox.classList.remove("hidden")
-            alertMessage.textContent = error["responseJSON"]["error"]
-            alertBox.scrollIntoView();
+            notyf.error(error["responseJSON"]["error"])
         }
     });
 }
 
 function removeDish(element){
+    var notyf = new Notyf({
+        duration: 2000,
+        position: {
+            x: "right",
+            y: "top",
+        }
+    });
+
     $.ajax({
         type: "DELETE",
         url: "/api/bookmarks",
@@ -29,8 +43,7 @@ function removeDish(element){
             displayCount();
         },
         error: function(error){
-            alertBox.classList.remove("hidden")
-            alertMessage.textContent = error["responseJSON"]["error"]
+            notyf.error(error["responseJSON"]["error"])
         }
     });
 }

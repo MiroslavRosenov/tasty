@@ -14,37 +14,39 @@ function validateLoginPassowrd(password){
 }
 
 function loginInputHandler(){
-    let emailBox = document.getElementById("login-email");
-    let passwordBox = document.getElementById("login-password");
+    const emailBox = document.getElementById("login-email");
+    const passwordBox = document.getElementById("login-password");
 
-    let alertBox = document.getElementById("alertBox")
-    let alertMessage = document.getElementById("alertMessage")
+    var notyf = new Notyf({
+        duration: 2000,
+        position: {
+            x: "right",
+            y: "top",
+        }
+    });
 
     if (!validateLoginEmail(emailBox.value)){
-        alertBox.classList.remove("hidden")
-        alertMessage.textContent = "Моля, въведете валиден имейл!"
-        return;
+        notyf.error("Моля, въведете валиден имейл!");
     }
-    if (!validateLoginPassowrd(passwordBox.value)){
-        alertBox.classList.remove("hidden")
-        alertMessage.textContent = "Моля, въведете валидна парола!"
-        return;
+    else if (!validateLoginPassowrd(passwordBox.value)){
+        notyf.error("Моля, въведете валидна парола!");
     }
+    else {
+        const data = {
+            "email": emailBox.value,
+            "password": passwordBox.value
+        };
     
-    data = {
-        "email": emailBox.value,
-        "password": passwordBox.value
-    };
-    $.ajax({
-        type: "POST",
-        url: "/signin",
-        data: JSON.stringify(data),
-        success: function(resp) {
-            window.location.href = "/";
-        },
-        error: function(error){            
-            alertBox.classList.remove("hidden")
-            alertMessage.textContent = error["responseJSON"]["error"]
-        }
-    })
+        $.ajax({
+            type: "POST",
+            url: "/signin",
+            data: JSON.stringify(data),
+            success: function(resp) {
+                window.location.href = "/";
+            },
+            error: function(error){
+                notyf.error(error["responseJSON"]["error"]);
+            }
+        })
+    }
 }

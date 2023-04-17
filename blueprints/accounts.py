@@ -1,10 +1,12 @@
 import hashlib
 import json
 import time
+import contextlib
 
 from quart_auth import AuthUser, login_required, login_user, logout_user, current_user
 from quart import Blueprint, render_template, redirect, url_for, request, current_app
 
+from smtplib import SMTPRecipientsRefused
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from ext.base import cursor_to_dict
 
@@ -13,7 +15,7 @@ from mysql.connector.errors import IntegrityError
 
 accounts = Blueprint("accounts", __name__)
 
-MAIL_BODY = "http://127.0.0.1:8000/confirm/{token}"
+MAIL_BODY = "https://vkusno.noit.eu/confirm/{token}"
 
 @accounts.route("/signin", methods=["GET", "POST"])
 async def signin() -> None:
@@ -54,10 +56,12 @@ async def signup() -> None:
                     "error": "Имейлът вече се използва!" 
                 }, 500
             else:
-                token = generate(email)
-                await current_app.mail.send(
-                    email, "Моля, потвърдете регистрацията си", MAIL_BODY.format(token=token)
-                )
+                with contextlib.suppress(SMTPRecipientsRefused):
+                    token = generate(email)
+                    await current_app.mail.send(
+                        email, "Моля, потвърдете регистрацията си", MAIL_BODY.format(token=token)
+                    )
+                
                 current_app.db.commit()
 
                 return {
@@ -67,14 +71,9 @@ async def signup() -> None:
 @accounts.get("/signout")
 async def signout() -> None:
     logout_user()
-    return redirect(url_for("dishes.index"))
+    return redirect(url_for("index"))
 
-@accounts.route("/password-reset")
-async def password_reset() -> None:
-    if request.method == "GET":
-        return await render_template("password_reset.html")
-
-@accounts.route("/confirm/<string:token>")
+@accounts.get("/confirm/<string:token>")
 async def confirm_account(token: str) -> None:
     try:
         email = confirm(token)
@@ -88,7 +87,7 @@ async def confirm_account(token: str) -> None:
             current_app.db.commit()
         
         await current_app.mail.send(
-            email, "Моля, потвърдете регистрацията си", MAIL_BODY.format(token=token)
+            email, "Моля, потвърдете регистрацията си във Вкусно!", MAIL_BODY.format(token=token)
         )
         return await render_template("exception.html", details={
             "title": "Не можахме да потвърдим акаунта ви!",
@@ -113,8 +112,9 @@ async def confirm_account(token: str) -> None:
             resp = cur.fetchone()
 
             login_user(AuthUser(resp["id"]), True)
+            return redirect("/")
 
-@accounts.route("/bookmarks")
+@accounts.get("/bookmarks")
 @login_required
 async def bookmarks() -> None:
     with current_app.db.cursor(prepared=True, buffered=False) as cur:

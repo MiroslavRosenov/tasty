@@ -1,27 +1,68 @@
-{% extends "base.html" %}search
+{% extends "base.html" %}
 {% block content %}
-<body class="bg-blue-50 overflow-x-hidden">
-	<div class="hidden md:block overflow-hidden bg-bookmark-purple rounded-l-full absolute h-80 w-2/4 top-32 right-0 lg: -bottom-28 lg:-right-36"></div>
-	<section class="relative md:m-10">
-		<div id="search" class="font-medium text-2xl md:text-4xl text-center mb-6">Вашите любими ястия</div>
-		<div class="bg-white p-3 shadow-sm rounded-sm">
-			<div class="grid grid-cols-2 md:grid-cols-6 gap-3">
-                {% for dish in results %}
-                <div onclick="window.location.href = `/dishes/{{ dish['id'] }}`" class="rounded overflow-hidden shadow-lg cursor-pointer transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105 ...">
-                    <img class="w-full h-64 object-cover" src="{{ dish['imageUrl'] }}">
-                    <div class="px-6 py-4">
-                        <div class="font-medium text-center mb-2 overflow-ellipsis overflow-hidden whitespace-nowrap ...">
-                            <span>
-                                {{ dish["title"] }}
-                            </span>
-                        </div>
+<div class="px-4 py-6">
+    <div class="font-medium text-2xl md:text-4xl text-center mb-6">Вашите любими ястия</div>
+    {% if results|length > 1 %}
+    <div class="border-b-4 border-blue-600 mb-8 mx-3 py-8">
+        <div class="text-xl text-end font-bold leading-none text-gray-900 sm:text-2xl">
+            Най-срещани продукти във вашите любими рецепти
+        </div>
+        <div id="ingredientsChart" class="h-[500px]"></div>
+    </div>
+    {% endif %}
+
+    <div class="bg-white p-3 shadow-sm rounded-sm">
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+            {% for dish in results %}
+            <div onclick="window.location.href = `/dishes/{{ dish['id'] }}`" class="rounded overflow-hidden shadow-lg cursor-pointer transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105 ...">
+                <img class="w-full h-64 object-cover" src="{{ dish['imageUrl'] }}">
+                <div class="px-6 py-4">
+                    <div class="font-medium text-center mb-2 overflow-ellipsis overflow-hidden whitespace-nowrap ...">
+                        <span>
+                            {{ dish["title"] }}
+                        </span>
                     </div>
                 </div>
-                {% else %}
-                <p class="text-center my-4 text-sm font-medium text-gray-400">Няма намерени ястия</p>
-                {% endfor %}
             </div>
-		</div>
-	</section>
-</body>
+            {% else %}
+            <p class="text-center my-4 text-sm font-medium text-gray-400">Няма намерени ястия</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if results|length > 1 %}
+    <script>
+        $.ajax({
+            type: "GET",
+            url: "/api/userTop",
+            success: function(res) {
+                var chart = new ApexCharts(
+                    document.getElementById("ingredientsChart"),
+                    {
+                        chart: {
+                            type: "donut",
+                            height: "100%"
+                        },
+                        series: res["data"],
+                        labels: res["labels"],
+                        plotOptions: {
+                            pie: {
+                                expandOnClick: false
+                            },
+                        },
+                        legend: {
+                            show: true,
+                            position: "right",
+                        }
+                    }
+                );
+                chart.render();
+            },
+            error: function(error){
+                console.log(error)
+            }
+        })
+    </script>
+    {% endif %}
+</div>
 {% endblock content %}

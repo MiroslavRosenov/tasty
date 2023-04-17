@@ -1,12 +1,11 @@
-
-function validateSignupName(name){
-    if (name === null || name.length < 6){
+function nameValidation(name){
+    if (name === null || name.length < 2){
         return false;
     }
     return true;
 }
 
-function validateSignupEmail(email){
+function emailValidation(email){
     const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (email === null || email.length === 0 || !re.test(email)){
         return false;
@@ -14,7 +13,7 @@ function validateSignupEmail(email){
     return true;
 }
 
-function validateSignupPassword(password){
+function passwordValidation(password){
     if (password === null || password.length < 8){
         return false;
     }
@@ -22,59 +21,59 @@ function validateSignupPassword(password){
 }
 
 function signupInputHandler(){
-    let firstName = document.getElementById("signup-firstName");
-    let lastName = document.getElementById("signup-lastName");
-    let emailBox = document.getElementById("signup-email");
-    let passwordBox = document.getElementById("signup-password");
-    let confirmPasswordBox = document.getElementById("signup-confirm-password");
+    const firstName = document.getElementById("signup-firstName");
+    const lastName = document.getElementById("signup-lastName");
+    const emailBox = document.getElementById("signup-email");
+    const passwordBox = document.getElementById("signup-password");
+    const confirmPasswordBox = document.getElementById("signup-confirm-password");
 
-    let alertBox = document.getElementById("alertBox")
-    let alertMessage = document.getElementById("alertMessage")
-
-    if (!validateSignupName(firstName.value)){
-        alertBox.classList.remove("hidden")
-        alertMessage.textContent = "Моля, въведете име от поне 6 знака!"
-        return;
-    }
-
-    if (!validateSignupName(lastName.value)){
-        alertBox.classList.remove("hidden")
-        alertMessage.textContent = "Моля, въведете фамилия от поне 6 знака!"
-        return;
-    }
-
-    if (!validateSignupEmail(emailBox.value)){
-        alertBox.classList.remove("hidden")
-        alertMessage.textContent = "Моля, въведете валиден имейл!"
-        return;
-    }
-    if (!validateSignupPassword(passwordBox.value)){
-        alertBox.classList.remove("hidden")
-        alertMessage.textContent = "Моля, въведете парола, съдържаща поне 8 знака!"
-        return;
-    }
-    if (passwordBox.value !== confirmPasswordBox.value){
-        alertBox.classList.remove("hidden")
-        alertMessage.textContent = "Паролата и потвърждението трябва да съвпадат!"
-        return;
-    }
-    data = {
-        "firstName": firstName.value, 
-        "lastName": lastName.value,
-        "email": emailBox.value, 
-        "password": passwordBox.value
-    }
-    $.ajax({
-        type: "POST",
-        url: "/signup",
-        data: JSON.stringify(data),
-        success: function(resp) {
-            // alertBox.classList.replace("bg-green-100 rounded-lg py-5 px-6 mb-4 text-base text-green-700 mb-3")
-            alertMessage.textContent = resp["message"]
-        },
-        error: function(error){
-            alertBox.classList.remove("hidden")
-            alertMessage.textContent = error["responseJSON"]["error"]
+    var notyf = new Notyf({
+        duration: 2000,
+        position: {
+            x: "right",
+            y: "top",
         }
-    })
+    });
+
+    if (!nameValidation(firstName.value)){
+        notyf.error("Моля, въведете име от поне 2 знака!");
+    } 
+    else if (!nameValidation(lastName.value)){
+        notyf.error("Моля, въведете фамилия от поне 2 знака!");
+    } 
+    else if (!emailValidation(emailBox.value)){
+        notyf.error("Моля, въведете валиден имейл!");
+    } 
+    else if (!passwordValidation(passwordBox.value)){
+        notyf.error("Моля, въведете парола, съдържаща поне 8 знака!");
+    }
+    else if (passwordBox.value !== confirmPasswordBox.value){
+        notyf.error("Паролата и потвърждението трябва да съвпадат!");
+    }
+    else {
+        const data = {
+            "firstName": firstName.value, 
+            "lastName": lastName.value,
+            "email": emailBox.value, 
+            "password": passwordBox.value
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/signup",
+            data: JSON.stringify(data),
+            beforeSend: function() {            
+                $("#sumbitButton").prop("disabled", true)
+            },
+            success: function(resp) {
+                notyf.success(resp["message"]);
+            },
+            error: function(error){
+                notyf.error(error["responseJSON"]["error"]);
+            },
+            complete: function(data) {
+                $("#sumbitButton").prop("disabled", false);
+            }
+        })
+    }
 }

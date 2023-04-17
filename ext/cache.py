@@ -16,8 +16,8 @@ from typing import Callable, Coroutine, Optional,  Tuple, Union, Dict,  List, An
 
 __all__ = ("getter", "setter")
 
-Coro = Coroutine[Any, Any, Any]
-Cache = OrderedDict[Tuple[str, Tuple], Any]
+Coro = Coroutine
+Cache = OrderedDict
 
 
 class Base:

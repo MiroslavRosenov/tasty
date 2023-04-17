@@ -1,50 +1,49 @@
-{% extends "base.html" %}search
+{% extends "base.html" %}
 {% block content %}
-<body class="bg-blue-50 overflow-x-hidden">
+<div class="px-4 py-6">
 	<div class="container mx-auto flex flex-col lg:flex-row items-center gap-12 mt-10">
 		<div class="flex flex-1 flex-col items-center lg:items-start overflow-hidden">
 			<h2 class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500 font-bold text-3xl md:text-4 lg:text-6xl text-center lg:text-center mb-2 py-2 slideUp">
-				Учете. Гответе. Споделяйте.
+				Учете! Гответе! Споделяйте!
 			</h2>
 			<div class="overflow-hidden">
 				<p class="font-thin text-xl md:text-3xl text-center lg:text-left slideUp">
-					Сбогувайте се дългите и разочароващи
+					Сбогувайте се с дългите и разочароващи
 				</p>
 				<p class="font-thin text-xl md:text-3xl text-center lg:text-left slideUp">
-					блогове за храна и видеоклипове с рецепти. 
+					блогове за храна и видеоклипове с рецепти.
 				</p>
 				<p class="font-thin text-xl md:text-3xl text-center lg:text-left slideUp">
-					Приготвяйте всяко ястие за минути нашите карти с рецепти.
+					Приготвяйте всяко ястие за минути с нашите предложения.
 				</p>
 			</div>
 			<div class="flex mx-auto md:mx-40 mt-6 justify-center flex-wrap gap-6">
-				<a href="/search">
-				<button type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-xl font-regular py-2 px-4 rounded transition duration-500 ease-in-out bg-blue-600 hover:bg-red-600 transform hover:-translate-y-1 hover:scale-110 ...">Търсене на ястия</button>
+				<a href="{{ url_for('dishes.search') }}">
+					<button type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-xl font-regular py-2 px-4 rounded transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110">Търсене на ястия</button>
 				</a>
 			</div>
 		</div>
 		<div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
-			<img class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full fadeInRotate" src="{{ url_for('static', filename='images/hero-dish.png') }}" alt="" />
+			<img class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full fadeInRotate" src="{{ url_for('static', filename='images/hero-dish.png') }}">
 		</div>
 	</div>
-	<!-- <canvas id="myChart"></canvas> -->
 
-	<!-- <section class="relative md:m-10">
-		<div id="search" class="font-medium text-2xl md:text-4xl text-center mb-6">Гответе с каквото разполагате!</div>
-		<div class="bg-white p-3 shadow-sm rounded-sm">
-			<div class="border rounded overflow-hidden flex mb-4">
-				<input name="tags" id="home-dish-search-bar" type="text" class="w-full px-4 py-2 border-gray-300 focus:ring-blue-600 font-regular" placeholder="Какво търсиш да сготвиш?">
+	<div class="grid grid-cols-2 mb-14 mx-3">
+		<div class="border-r-4 border-blue-600">
+			<div class="text-xl text-start font-bold leading-none text-gray-900 sm:text-2xl">
+				Топ 15 най-харесвани рецепти
 			</div>
-			<p id="home-no-posts" class="text-center my-4 text-sm font-medium text-gray-400 hidden">Няма намерени ястия</p>
-			<div id="home-posts" class="grid grid-cols-2 md:grid-cols-6 gap-5"></div>
+			<div id="likesChart" class="h-[500px] py-5"></div>
 		</div>
-	</section> -->
-	<script src="https://unpkg.com/@yaireo/tagify"></script>
-    <script src="https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
 
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<!-- <script src="{{ url_for('static', filename='js/charts.js') }}"></script> -->
-	<!-- https://www.chartjs.org/docs/latest/getting-started/ -->
-
-</body>
+		<div>
+			<div class="text-xl text-end font-bold leading-none text-gray-900 sm:text-2xl">
+				Най-срещани продукти за всички рецепти
+			</div>
+			<div id="ingredientsChart" class="h-[500px] py-5"></div>
+		</div>
+	</div>
+	
+	<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+</div>
 {% endblock content %}

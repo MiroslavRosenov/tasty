@@ -4,6 +4,7 @@ import json
 import contextlib
 
 from typing import Optional, Dict, List
+from mysqlx import IntegrityError
 from quart import current_app
 from mysql.connector.cursor import MySQLCursorPrepared
 
@@ -22,10 +23,8 @@ async def search_tags(ingredients: List[str]) -> Dict:
         if (resp := cursor_to_dict(cur)):
             return {"results": resp}
         
-    
         resp = httpx.get(
             "https://api.spoonacular.com/recipes/findByIngredients",
-
             params={
                 "ingredients": ",".join(ingredients),
                 "apiKey": os.getenv("TOKEN"),
@@ -100,18 +99,19 @@ async def recipe_details(id: int) -> Dict:
         }
 
     with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-        query = "INSERT INTO details (id, title, readyInMinutes, imageUrl, ingredients, instructions) VALUES (%s, %s, %s, %s, %s, %s)"
-        cur.execute(
-            query, 
-            (
-                data["id"],
-                translate(data["title"]),
-                data["readyInMinutes"],
-                data["image"],
-                json.dumps([{"name": translate(x["name"]), "imageUrl": f"https://spoonacular.com/cdn/ingredients_100x100/{x['image']}"} for x in data["extendedIngredients"]], ensure_ascii=False),
-                json.dumps([translate(x["step"]) for x in data["analyzedInstructions"][0]["steps"]] if len(data["analyzedInstructions"]) != 0 else [], ensure_ascii=False)
+        with contextlib.suppress(IntegrityError):
+            query = "INSERT INTO details (id, title, readyInMinutes, imageUrl, ingredients, instructions) VALUES (%s, %s, %s, %s, %s, %s)"
+            cur.execute(
+                query, 
+                (
+                    data["id"],
+                    translate(data["title"]),
+                    data["readyInMinutes"],
+                    data["image"],
+                    json.dumps([{"name": translate(x["name"]), "imageUrl": f"https://spoonacular.com/cdn/ingredients_100x100/{x['image']}"} for x in data["extendedIngredients"]], ensure_ascii=False),
+                    json.dumps([translate(x["step"]) for x in data["analyzedInstructions"][0]["steps"]] if len(data["analyzedInstructions"]) != 0 else [], ensure_ascii=False)
+                )
             )
-        )
         
         cur.execute("SELECT * FROM details WHERE id = %s", (data['id'],))
         resp = cur.fetchone()
@@ -126,9 +126,8 @@ def cursor_to_dict(cur: MySQLCursorPrepared, strategy: str = "all") -> Optional[
     row_headers=[x for x in cur.column_names]
     data = [dict(zip(row_headers, result)) for result in cur.fetchall()] or None
     
-    match strategy:
-        case "all":
-            return data 
-        case "one":
-            with contextlib.suppress(TypeError):
-                return data[0]
+    if strategy == "all":
+        return data 
+    else:
+        with contextlib.suppress(TypeError):
+            return data[0]

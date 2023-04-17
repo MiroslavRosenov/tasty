@@ -2,7 +2,8 @@ import json
 import contextlib
 
 from quart import Blueprint, request, current_app
-from quart_auth import current_user
+from quart_auth import current_user, login_required
+from collections import Counter
 
 from ext.translator import Translator
 from ext.base import cursor_to_dict, search_tags
@@ -52,7 +53,6 @@ async def bookmarks() -> None:
             current_app.db.commit()
             return "", 200
 
-
 @api.post("/bookmarksCount")
 async def bookmarksCount() -> None:
     data = json.loads(await request.data)
@@ -63,3 +63,62 @@ async def bookmarksCount() -> None:
         resp = cur.fetchone()
 
         return {"count": resp["amount"]}
+    
+@api.get("/topIngredients")
+async def topIngredients() -> None:
+    output = {
+        "labels": [],
+        "data": []
+    }
+    
+    with current_app.db.cursor(dictionary=True, buffered=False) as cur:
+        cur.execute("SELECT ingredients FROM dishes")
+
+        ingr = []
+        for i in [json.loads(x["ingredients"]) for x in cur.fetchall()]:
+            ingr.extend(i)
+
+        for i in Counter(ingr).most_common(15):
+            output["labels"].append(i[0])
+            output["data"].append(i[1])
+    return output
+
+@api.get("/topLiked")
+async def topLiked() -> None:
+    output = {
+        "labels": [],
+        "data": []
+    }
+    
+    with current_app.db.cursor(dictionary=True, buffered=False) as cur:
+        cur.execute("SELECT dish FROM bookmarks")
+
+        for i in Counter([x["dish"] for x in cur.fetchall()]).most_common(15):
+            cur.execute("SELECT title FROM dishes WHERE id = %s", (i[0],))
+
+            output["labels"].append(cur.fetchone()["title"])
+            output["data"].append(i[1])
+    
+    return output
+
+
+@api.get("/userTop")
+@login_required
+async def userTop() -> None:
+    output = {
+        "labels": [],
+        "data": []
+    }
+        
+    with current_app.db.cursor(dictionary=True, buffered=False) as cur:
+        query = "SELECT * FROM dishes WHERE id IN (SELECT dish FROM bookmarks WHERE account = %s) ORDER BY timestamp DESC"
+        cur.execute(query, (current_user.auth_id,))
+
+        ingr = []
+        for i in [json.loads(x["ingredients"]) for x in cur.fetchall()]:
+            ingr.extend(i)
+
+        for i in Counter(ingr).most_common(15):
+            output["labels"].append(i[0].split(" -")[0])
+            output["data"].append(i[1])
+        return output

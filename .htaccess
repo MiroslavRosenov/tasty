@@ -1,0 +1,10 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/noit1/vkusno.noit.eu"
+PassengerBaseURI "/"
+PassengerPython "/home/noit1/virtualenv/vkusno.noit.eu/3.9/bin/python"
+PassengerAppLogFile "/home/noit1/vkusno.noit.eu/logs/log.log"
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+
+RewriteEngine On 
+RewriteCond %{HTTPS} off 
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

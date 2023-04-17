@@ -1,27 +1,61 @@
-const data = {
-    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-    datasets: [{
-      label: '# of Votes',
-      data: [12, 19, 3, 5, 2, 3],
-      borderWidth: 1
-    }]
-}
-
-const config = {
-    type: 'bar',
-    data: data,
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: 'Chart.js Doughnut Chart'
+$.ajax({
+    type: "GET",
+    url: "/api/topIngredients",
+    success: function(res) {
+        var chart = new ApexCharts(
+            document.getElementById("ingredientsChart"),
+            {
+                chart: {
+                    type: "donut",
+                    height: "100%"
+                },
+                series: res["data"],
+                labels: res["labels"],
+                plotOptions: {
+                    pie: {
+                        expandOnClick: false
+                    },
+                },
+                legend: {
+                    show: true,
+                    position: "right",
+                }
             }
-        }
+        );
+        chart.render();
     },
-}
+    error: function(error){
+        console.log(error)
+    }
+})
 
-new Chart(document.getElementById("myChart"), config)
+$.ajax({
+    type: "GET",
+    url: "/api/topLiked",
+    success: function(res) {
+        var chart = new ApexCharts(
+            document.getElementById("likesChart"),
+            {
+                chart: {
+                    type: "donut",
+                    height: "100%"
+                },
+                series: res["data"],
+                labels: res["labels"],
+                plotOptions: {
+                    pie: {
+                        expandOnClick: false
+                    }
+                },
+                legend: {
+                    show: true,
+                    position: "left",
+                }
+            }
+        );
+        chart.render();
+    },
+    error: function(error){
+        console.log(error)
+    }
+})

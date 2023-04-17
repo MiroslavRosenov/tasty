@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<body class="bg-blue-50">
+<div class="px-4 py-6">
     <div class="bg-grey-lighter min-h-screen flex flex-col">
         <div class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2">
-            <div id="alertBox" class="bg-red-100 rounded-lg py-5 px-6 mb-4 text-base text-red-700 mb-3 hidden" role="alert">
+            <div id="alertBox" class="bg-red-100 rounded-lg py-5 px-6 text-base text-red-700 mb-3 hidden" role="alert">
 				<h1 id="alertMessage"></h1>
 			</div>
             <div class="bg-white px-6 py-8 rounded shadow-md text-black w-full">
@@ -13,17 +13,7 @@
                 <input type="text" class="block border border-grey-light w-full p-3 rounded mb-4 font-light" id="signup-email" name="email" placeholder="Имейл">
                 <input type="password" class="block border border-grey-light w-full p-3 rounded mb-4 font-light" id="signup-password" name="password" placeholder="Парола">
                 <input type="password" class="block border border-grey-light w-full p-3 rounded mb-4 font-light" id="signup-confirm-password" name="confirm_password" placeholder="Потвърди паролата">
-                <button type="submit" onClick="signupInputHandler()" class="w-full text-center py-3 rounded bg-blue-600 text-white hover:bg-blue-700 focus:outline-none my-1 font-regular">Създай акаунт</button>
-
-                <!-- <div class="text-center text-sm text-grey-dark mt-4 font-regular">
-                    By signing up, you agree to the 
-                    <a class="no-underline border-b border-grey-dark text-grey-dark" href="#">
-                        Terms of Service
-                    </a> and 
-                    <a class="no-underline border-b border-grey-dark text-grey-dark" href="#">
-                        Privacy Policy
-                    </a>
-                </div> -->
+                <button type="submit" id-="sumbitButton" onClick="signupInputHandler()" class="w-full text-center py-3 rounded bg-blue-600 text-white hover:bg-blue-700 focus:outline-none my-1 font-regular">Създай акаунт</button>
             </div>
 
             <div class="text-grey-dark mt-6 font-regular">
@@ -32,6 +22,6 @@
             </div>
         </div>
     </div>
-    <script src="{{ url_for('static', filename='js/signUpHandler.js') }}"></script>
-</body>
+    <script src="{{ url_for('static', filename='js/signupHandler.js') }}"></script>
+</div>
 {% endblock content %}
