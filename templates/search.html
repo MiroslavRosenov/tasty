@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="px-4 py-6 h-full">
-	<div id="search" class="font-medium text-2xl md:text-4xl text-center mb-6">Гответе с каквото разполагате!</div>
-	<div class="bg-white p-3 shadow-sm rounded-sm">
-		<div class="border rounded overflow-hidden flex mb-4">
-			<input name="tags" id="home-dish-search-bar" type="text" class="w-full px-4 py-2 border-gray-300 focus:ring-blue-600 font-regular" placeholder="Какво търсиш да сготвиш?">
+<div class="px-4 py-6">
+	<div class="h-full">
+		<div id="search" class="font-medium text-2xl md:text-4xl text-center mb-6">Гответе с каквото разполагате!</div>
+		<div class="bg-white p-3 shadow-sm rounded-sm">
+			<div class="border rounded overflow-hidden flex mb-4">
+				<input name="tags" id="home-dish-search-bar" type="text" class="w-full px-4 py-2 border-gray-300 focus:ring-blue-600 font-regular" placeholder="Какво търсиш да сготвиш?">
+			</div>
+			<p id="home-no-posts" class="text-center my-4 text-sm font-medium text-gray-400 hidden">Няма намерени ястия</p>
+			<div id="home-posts" class="grid grid-cols-2 md:grid-cols-6 gap-5"></div>
 		</div>
-		<p id="home-no-posts" class="text-center my-4 text-sm font-medium text-gray-400 hidden">Няма намерени ястия</p>
-		<div id="home-posts" class="grid grid-cols-2 md:grid-cols-6 gap-5"></div>
 	</div>
 
 	<script src="https://unpkg.com/@yaireo/tagify"></script>

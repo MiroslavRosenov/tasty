@@ -6,7 +6,6 @@ function populateRecentPostedDishes(data) {
     }
 
     data.forEach(dish => {
-        // Card div
         let postCard = document.createElement("div");
         postCard.id = dish["id"];
         postCard.className = "rounded overflow-hidden shadow-lg cursor-pointer transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105 ...";
@@ -17,7 +16,7 @@ function populateRecentPostedDishes(data) {
         // Image
         let dishImage = document.createElement("img");
         dishImage.className = "w-full h-64 object-cover";
-        dishImage.src = dish["imageUrl"];
+        dishImage.src = dish["imageurl"];
         dishImage.alt = dish["title"];
 
         // Text div
@@ -34,12 +33,11 @@ function populateRecentPostedDishes(data) {
         
         let tag = document.createElement("span");
         tag.className = "inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2 overflow-hidden overflow-ellipsis ..."
-        tag.textContent = Array.from(JSON.parse(dish["ingredients"])).join(", ")
+        tag.textContent = Array.from(dish["ingredients"]).join(", ")
         tagDiv.appendChild(tag);
 
         postCard.appendChild(dishImage);
         postCard.appendChild(textDiv);
-        // postCard.appendChild(tagDiv);
         postSection.appendChild(postCard);
     })
 }
@@ -70,7 +68,8 @@ function onSearchChange(element){
         url: "/api/searchRecipe",
         data: JSON.stringify({"ingredients": JSON.parse(element.target.value)}),
         success: function(data) {
-            console.log(data["results"])
+            console.log(data)
+
             if (data["results"] === undefined) {
                 document.getElementById("home-no-posts").classList.remove("hidden")
                 populateRecentPostedDishes([]);

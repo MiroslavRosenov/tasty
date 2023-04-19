@@ -1,7 +1,7 @@
 quart==0.18.3
 quart-auth==0.7.0
 httpx==0.23.1
-mysql-connector-python==8.0.29
+asyncpg
 python-dotenv==0.21.1
 beautifulsoup4==4.11.1
 

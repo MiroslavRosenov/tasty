@@ -1,5 +1,5 @@
-from quart import Blueprint, render_template
-from ext.base import recipe_details
+from quart import Blueprint, current_app, render_template
+from ext.postgres.base import PostgreSQLClient
 
 dishes = Blueprint("dishes", __name__)
 
@@ -9,4 +9,5 @@ async def search() -> None:
 
 @dishes.get("/dishes/<int:id>")
 async def dish(id: int) -> None:
-    return await render_template("dish.html", data=await recipe_details(id=id))
+    pool: PostgreSQLClient = current_app.db
+    return await render_template("dish.html", data=dict(await pool.dishes.get(id)))

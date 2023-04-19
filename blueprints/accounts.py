@@ -2,16 +2,23 @@ import hashlib
 import json
 import time
 import contextlib
+import typing
 
 from quart_auth import AuthUser, login_required, login_user, logout_user, current_user
 from quart import Blueprint, render_template, redirect, url_for, request, current_app
 
 from smtplib import SMTPRecipientsRefused
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from ext.base import cursor_to_dict
 
 from ext.tokes import generate, confirm
-from mysql.connector.errors import IntegrityError
+from asyncpg import UniqueViolationError
+
+import asyncpg.pool
+
+if typing.TYPE_CHECKING:
+    from ext.postgres.base import PostgreSQLClient
+else:
+    from asyncpg.pool import Pool as PostgreSQLClient
 
 accounts = Blueprint("accounts", __name__)
 
@@ -21,52 +28,52 @@ MAIL_BODY = "https://vkusno.noit.eu/confirm/{token}"
 async def signin() -> None:
     if request.method == "GET":
         return await render_template("signin.html")
-    else:
-        data = json.loads(await request.data)
+    
+    data = json.loads(await request.data)
+    pool: PostgreSQLClient = current_app.db
+    
+    if not (resp := await pool.fetchrow(
+        "SELECT * FROM accounts WHERE email = $1 AND password = $2",
+        data.get("email"), 
+        hashlib.sha256(data.get("password").encode("utf-8")).hexdigest()
 
-        query = "SELECT * FROM accounts WHERE email = %s AND password = %s"
-        with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-            cur.execute(query, (data.get("email"), hashlib.sha256(data.get("password").encode("utf-8")).hexdigest()))
-            
-            if not (resp := cur.fetchone()):
-                return {
-                    "error": "Акаунтът не беше намерен"
-                }, 404
-            if not resp["confirmed"]:
-                return {
-                    "error": "Моля, потвърдете акаунта си" 
-                }, 403
-            login_user(AuthUser(resp["id"]), data.get("remember"))
-            return "", 200
+    )):
+        return {
+            "error": "Акаунтът не беше намерен"
+        }, 404
+    if not resp["confirmed"]:
+        return {
+            "error": "Моля, потвърдете акаунта си" 
+        }, 403
+    login_user(AuthUser(resp["id"]), data.get("remember"))
+    return "", 200
 
 @accounts.route("/signup", methods=["GET", "POST"])
 async def signup() -> None:
     if request.method == "GET":
         return await render_template("signup.html")
+    
+    data = json.loads(await request.data)
+    pool: PostgreSQLClient = current_app.db
+
+    try:
+        await pool.execute(
+            "INSERT INTO accounts (email, firstName, lastName, password) VALUES ($1, $2, $3, $4)",
+            (email := data.get("email")), data.get("firstName"), data.get("lastName"), hashlib.sha256(data.get("password").encode("utf-8")).hexdigest()
+        )
+    except UniqueViolationError:
+        return {
+            "error": "Имейлът вече се използва!" 
+        }, 500
     else:
-        data = json.loads(await request.data)
+        with contextlib.suppress(SMTPRecipientsRefused):
+            await current_app.mail.send(
+                email, "Моля, потвърдете регистрацията си", MAIL_BODY.format(token=await generate(email))
+            )
 
-        query = "INSERT INTO accounts (id, email, firstName, lastName, password) VALUES (%s ,%s, %s, %s, %s)"
-        with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-            email = data.get("email")
-            try:
-                cur.execute(query, (int(time.time()), email, data.get("firstName"), data.get("lastName"), hashlib.sha256(data.get("password").encode("utf-8")).hexdigest()))
-            except IntegrityError:
-                return {
-                    "error": "Имейлът вече се използва!" 
-                }, 500
-            else:
-                with contextlib.suppress(SMTPRecipientsRefused):
-                    token = generate(email)
-                    await current_app.mail.send(
-                        email, "Моля, потвърдете регистрацията си", MAIL_BODY.format(token=token)
-                    )
-                
-                current_app.db.commit()
-
-                return {
-                    "message": "Вие успешно създадохте своя акаунт! Моля, потвърдете го с линка, изпратен на вашия имейл." 
-                }, 200
+        return {
+            "message": "Вие успешно създадохте своя акаунт! Моля, потвърдете го с линка, изпратен на вашия имейл." 
+        }, 200
 
 @accounts.get("/signout")
 async def signout() -> None:
@@ -75,20 +82,17 @@ async def signout() -> None:
 
 @accounts.get("/confirm/<string:token>")
 async def confirm_account(token: str) -> None:
+    pool: PostgreSQLClient = current_app.db
+    
     try:
-        email = confirm(token)
+        email = await confirm(token)
     except SignatureExpired:
         serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
         email = serializer.loads(token, salt=current_app.config["SECURITY_PASSWORD_SALT"])
         
-        with current_app.db.cursor() as cur:
-            query = "UPDATE tokens SET token = %s WHERE email = %s"
-            cur.execute(query, ((token := generate(email, False)), email))
-            current_app.db.commit()
+        await pool.execute("UPDATE tokens SET token = $1 WHERE email = $2", (new_token := generate(email, False)), email)
+        await current_app.mail.send(email, "Моля, потвърдете регистрацията си във Вкусно!", MAIL_BODY.format(token=new_token))
         
-        await current_app.mail.send(
-            email, "Моля, потвърдете регистрацията си във Вкусно!", MAIL_BODY.format(token=token)
-        )
         return await render_template("exception.html", details={
             "title": "Не можахме да потвърдим акаунта ви!",
             "message": "Линкът, който предоставихте, е изтекъл, изпратете ви нов"
@@ -99,25 +103,14 @@ async def confirm_account(token: str) -> None:
             "message": "Линкът, който предоставихте е невалидна!"
         })
     else:
-        with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-            query = "DELETE FROM tokens WHERE token = %s" 
-            cur.execute(query, (token,))
-
-            query = "UPDATE accounts SET confirmed = true WHERE email = %s"
-            cur.execute(query, (email,))
-            current_app.db.commit()
-
-            query = "SELECT * FROM accounts WHERE email = %s"
-            cur.execute(query, (email,))
-            resp = cur.fetchone()
-
-            login_user(AuthUser(resp["id"]), True)
-            return redirect("/")
+        await pool.execute("DELETE FROM tokens WHERE token = $1", token)
+        login_user(AuthUser(await pool.fetchval("UPDATE accounts SET confirmed = true WHERE email = $1 RETURNING id", email)), True)
+        return redirect("/")
 
 @accounts.get("/bookmarks")
 @login_required
 async def bookmarks() -> None:
-    with current_app.db.cursor(prepared=True, buffered=False) as cur:
-        query = "SELECT * FROM dishes WHERE id IN (SELECT dish FROM bookmarks WHERE account = %s) ORDER BY timestamp DESC"
-        cur.execute(query, (current_user.auth_id,))
-        return await render_template("bookmarks.html", results=cursor_to_dict(cur) or [])
+    pool: PostgreSQLClient = current_app.db
+
+    resp = await pool.fetch("SELECT * FROM dishes WHERE id IN (SELECT dish FROM bookmarks WHERE account = $1) ORDER BY timestamp DESC", current_user.auth_id)
+    return await render_template("bookmarks.html", results=resp)

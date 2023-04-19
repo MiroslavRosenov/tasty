@@ -3,7 +3,7 @@
 <div class="px-4 py-6">
     <div class="flex pt-5 md:pt-12 justify-center">
         <div class="mb-8">
-            <img class="rounded-lg object-cover object-center w-full" src="{{ data.imageUrl }}"/>
+            <img class="rounded-lg object-cover object-center w-full" src="{{ data.imageurl }}"/>
         </div>
     </div>
     
@@ -13,10 +13,12 @@
             <div class="pt-5 px-6 max-w-xl lg:max-w-5xl mb-4">
                 <h2 class="text-2xl font-medium text-blue-600">Съставки<span class="text-indigo-600"></span></h2>
                 <table class="table-auto w-full text-left whitespace-no-wrap">
-                    <tbody class="">
+                    <tbody>
                         {% for ingredient in data.ingredients %}
                         <tr>
-                            <td class="px-4 py-3"><img class="object-cover object-center rounded" style='height:30px;' alt="hero" src="{{ ingredient.imageUrl }}" /></td>
+                            <td class="px-4 py-3">
+                                <img class="object-cover object-center rounded" style='height:30px;' alt="hero" src="{{ ingredient.imageUrl }}">
+                            </td>
                             <td class="px-4 py-3">{{ ingredient.name }}</td>
                         </tr>
                         {% endfor %}

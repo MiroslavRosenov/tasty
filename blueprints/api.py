@@ -3,26 +3,25 @@ import contextlib
 
 from quart import Blueprint, request, current_app
 from quart_auth import current_user, login_required
+from typing import Dict
 from collections import Counter
 
 from ext.translator import Translator
-from ext.base import cursor_to_dict, search_tags
-from mysql.connector.errors import IntegrityError
+from ext.base import search_tags
+from ext.postgres.base import PostgreSQLClient
 
 api = Blueprint("api", __name__, url_prefix="/api")
 translate = Translator().translate
 
 @api.post("/searchRecipe")
 async def search() -> None:
-    data = json.loads(await request.data)
+    data: Dict = json.loads(await request.data)
     return await search_tags([translate(x["value"], "en", "bg") for x in data["ingredients"]])
 
 @api.get("/recentRecipes")
 async def recent() -> None:
-    with current_app.db.cursor(prepared=True, buffered=False) as cur:
-        query = "SELECT id, title, imageUrl, ingredients FROM dishes ORDER BY timestamp DESC LIMIT 12;"
-        cur.execute(query)
-        return {"results": cursor_to_dict(cur)}
+    pool: PostgreSQLClient = current_app.db
+    return {"results": [dict(x) for x in await pool.fetch("SELECT * FROM dishes ORDER BY timestamp DESC LIMIT 12;")]}
 
 @api.route("/bookmarks", methods=["POST", "PUT", "DELETE"])
 async def bookmarks() -> None:
@@ -32,93 +31,72 @@ async def bookmarks() -> None:
         }, 401
         
     data = json.loads(await request.data)
+    pool: PostgreSQLClient = current_app.db
+
     if request.method == "POST":
-        query = "SELECT * FROM bookmarks WHERE account = %s AND dish = %s"
-        with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-            cur.execute(query, (current_user.auth_id, data.get("id"),))
-            return {"state": bool(cur.fetchone())}
+        return {"state": bool(await pool.fetchrow("SELECT * FROM bookmarks WHERE account = $1 AND dish = $2", current_user.auth_id, data.get("id")))}
 
     if request.method == "PUT":
-        query = "INSERT INTO bookmarks(account, dish) VALUES(%s, %s)"
-        with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-            with contextlib.suppress(IntegrityError):
-                cur.execute(query, (current_user.auth_id, data.get("id"),))
-                current_app.db.commit()
-            return "", 200
+        await pool.execute("INSERT INTO bookmarks(account, dish) VALUES($1, $2)", current_user.auth_id, data.get("id"))
+        return "", 200
 
     if request.method == "DELETE":
-        query = "DELETE FROM bookmarks WHERE account = %s AND dish = %s"
-        with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-            cur.execute(query, (current_user.auth_id, data.get("id"),))
-            current_app.db.commit()
-            return "", 200
+        await pool.execute("DELETE FROM bookmarks WHERE account = $1 AND dish = $2", current_user.auth_id, data.get("id"))
+        return "", 200
 
 @api.post("/bookmarksCount")
 async def bookmarksCount() -> None:
     data = json.loads(await request.data)
-    query = "SELECT COUNT(*) as amount FROM bookmarks WHERE dish = %s"
-    
-    with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-        cur.execute(query, (data.get("id"),))
-        resp = cur.fetchone()
-
-        return {"count": resp["amount"]}
+    return {"count": (await current_app.db.fetchrow("SELECT COUNT(*) as amount FROM bookmarks WHERE dish = $1", data.get("id")))["amount"]}
     
 @api.get("/topIngredients")
 async def topIngredients() -> None:
+    pool: PostgreSQLClient = current_app.db
     output = {
         "labels": [],
         "data": []
     }
     
-    with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-        cur.execute("SELECT ingredients FROM dishes")
+    ingr = []
+    for i in [dict(x)["ingredients"] for x in await pool.fetch("SELECT ingredients FROM dishes")]:
+        ingr.extend(i)
 
-        ingr = []
-        for i in [json.loads(x["ingredients"]) for x in cur.fetchall()]:
-            ingr.extend(i)
-
-        for i in Counter(ingr).most_common(15):
-            output["labels"].append(i[0])
-            output["data"].append(i[1])
+    for i in Counter(ingr).most_common(15):
+        output["labels"].append(i[0])
+        output["data"].append(i[1])
     return output
 
 @api.get("/topLiked")
 async def topLiked() -> None:
+    pool: PostgreSQLClient = current_app.db
     output = {
         "labels": [],
         "data": []
     }
     
-    with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-        cur.execute("SELECT dish FROM bookmarks")
 
-        for i in Counter([x["dish"] for x in cur.fetchall()]).most_common(15):
-            cur.execute("SELECT title FROM dishes WHERE id = %s", (i[0],))
-
-            output["labels"].append(cur.fetchone()["title"])
-            output["data"].append(i[1])
-    
+    for i in Counter([dict(x)["dish"] for x in await pool.fetch("SELECT dish FROM bookmarks")]).most_common(15):
+        output["labels"].append(await pool.fetchval("SELECT title FROM dishes WHERE id = $1", i[0]))
+        output["data"].append(i[1])
     return output
-
 
 @api.get("/userTop")
 @login_required
 async def userTop() -> None:
+    pool: PostgreSQLClient = current_app.db
     output = {
         "labels": [],
         "data": []
     }
-        
-    with current_app.db.cursor(dictionary=True, buffered=False) as cur:
-        query = "SELECT * FROM dishes WHERE id IN (SELECT dish FROM bookmarks WHERE account = %s) ORDER BY timestamp DESC"
-        cur.execute(query, (current_user.auth_id,))
 
-        ingr = []
-        for i in [json.loads(x["ingredients"]) for x in cur.fetchall()]:
-            ingr.extend(i)
+    ingr = []
+    for i in [dict(x)["ingredients"] for x in await pool.fetch(
+        "SELECT * FROM dishes WHERE id IN (SELECT dish FROM bookmarks WHERE account = $1) ORDER BY timestamp DESC", 
+        current_user.auth_id
+    )]:
+        ingr.extend(i)
 
-        for i in Counter(ingr).most_common(15):
-            output["labels"].append(i[0].split(" -")[0])
-            output["data"].append(i[1])
-        return output
+    for i in Counter(ingr).most_common(15):
+        output["labels"].append(i[0].split(" -")[0])
+        output["data"].append(i[1])
+    return output

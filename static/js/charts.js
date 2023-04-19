@@ -7,7 +7,9 @@ $.ajax({
             {
                 chart: {
                     type: "donut",
-                    height: "100%"
+                    animations: {
+                        enabled: false
+                    },
                 },
                 series: res["data"],
                 labels: res["labels"],
@@ -18,7 +20,7 @@ $.ajax({
                 },
                 legend: {
                     show: true,
-                    position: "right",
+                    position: "bottom",
                 }
             }
         );
@@ -38,7 +40,9 @@ $.ajax({
             {
                 chart: {
                     type: "donut",
-                    height: "100%"
+                    animations: {
+                        enabled: false
+                    },
                 },
                 series: res["data"],
                 labels: res["labels"],
@@ -49,7 +53,7 @@ $.ajax({
                 },
                 legend: {
                     show: true,
-                    position: "left",
+                    position: "bottom",
                 }
             }
         );

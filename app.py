@@ -2,7 +2,6 @@ import os
 import dotenv
 import logging
 
-from mysql.connector import MySQLConnection
 from a2wsgi import ASGIMiddleware
 
 from quart import Quart, render_template, send_from_directory
@@ -10,6 +9,7 @@ from werkzeug.exceptions import NotFound
 from quart_auth import AuthManager, Unauthorized
 
 from ext.mail import EmailHandler
+from ext.postgres.base import PostgreSQLClient
 
 from blueprints.accounts import accounts
 from blueprints.dishes import dishes
@@ -49,13 +49,8 @@ async def not_found(exception: NotFound) -> None:
 @app.before_first_request
 async def setup() -> None:
     dotenv.load_dotenv()
-    app.db = MySQLConnection(
-        host=os.getenv("MYSQL_HOST"),
-        user=os.getenv("MYSQL_USER"),
-        database=os.getenv("MYSQL_DATABASE"),
-        password=os.getenv("MYSQL_PASSWORD")
-    )
 
+    app.db = await PostgreSQLClient.connect(app)
     app.mail = EmailHandler(
         os.getenv("SMTP_HOST"),
         os.getenv("SMTP_PORT"),
