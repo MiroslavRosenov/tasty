@@ -1,6 +1,5 @@
 import hashlib
 import json
-import time
 import contextlib
 import typing
 
@@ -12,8 +11,6 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 from ext.tokes import generate, confirm
 from asyncpg import UniqueViolationError
-
-import asyncpg.pool
 
 if typing.TYPE_CHECKING:
     from ext.postgres.base import PostgreSQLClient

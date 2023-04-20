@@ -74,9 +74,8 @@ async def topLiked() -> None:
         "data": []
     }
     
-
     for i in Counter([dict(x)["dish"] for x in await pool.fetch("SELECT dish FROM bookmarks")]).most_common(15):
-        output["labels"].append(await pool.fetchval("SELECT title FROM dishes WHERE id = $1", i[0]))
+        output["labels"].append(await pool.fetchval("SELECT title FROM dishes WHERE id = $1", i[0]) or "None")
         output["data"].append(i[1])
     return output
 

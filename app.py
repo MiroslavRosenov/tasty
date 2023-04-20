@@ -29,7 +29,7 @@ async def index() -> None:
     return await render_template("index.html")
 
 @app.get("/favicon.ico")
-async def favicon():
+async def favicon() -> None:
     return await send_from_directory(app.root_path, "favicon.ico", mimetype="image/vnd.microsoft.icon")
 
 @app.errorhandler(Unauthorized)

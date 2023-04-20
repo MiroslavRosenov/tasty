@@ -68,8 +68,6 @@ function onSearchChange(element){
         url: "/api/searchRecipe",
         data: JSON.stringify({"ingredients": JSON.parse(element.target.value)}),
         success: function(data) {
-            console.log(data)
-
             if (data["results"] === undefined) {
                 document.getElementById("home-no-posts").classList.remove("hidden")
                 populateRecentPostedDishes([]);

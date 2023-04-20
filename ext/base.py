@@ -23,7 +23,7 @@ async def search_tags(ingredients: List[str]) -> Dict:
         params={
             "ingredients": ",".join(ingredients),
             "apiKey": os.getenv("TOKEN"),
-            "number": 8,
+            "number": 12,
             "ranking": 1
         }
     )
@@ -39,4 +39,4 @@ async def search_tags(ingredients: List[str]) -> Dict:
             "details": "Recipe not found"
         }
     
-    return {"results": [dict(x) for x in [await pool.fetchrow("SELECT * FROM dishes WHERE id = $1", dish["id"]) or await pool.fetchrow("INSERT INTO dishes (id, title, imageUrl, ingredients) VALUES ($1, $2, $3, $4) RETURNING *", dish["id"], translate(dish["title"]), dish["image"], [translate(x["name"]) for x in [dish["usedIngredients"] + dish["missedIngredients"]]]) for dish in dishes]]}
+    return {"results": [dict(x) for x in [await pool.fetchrow("SELECT * FROM dishes WHERE id = $1", dish["id"]) or await pool.fetchrow("INSERT INTO dishes (id, title, imageUrl, ingredients) VALUES ($1, $2, $3, $4) RETURNING *", dish["id"], translate(dish["title"]), dish["image"], [translate(x["name"]) for x in dish["usedIngredients"] + dish["missedIngredients"]]) for dish in dishes]]}
