@@ -36,7 +36,7 @@ class Dishes(Table):
             }
 
         return dict(await self.database.fetchrow(
-            "INSERT INTO details (id, title, readyInMinutes, imageUrl, ingredients, instructions) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *", 
+            "INSERT INTO details (id, title, readyInMinutes, imageUrl, ingredients, instructions) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id) DO NOTHING RETURNING *", 
             data["id"],
             translate(data["title"]),
             data["readyInMinutes"],
